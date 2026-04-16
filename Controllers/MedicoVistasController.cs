@@ -17,7 +17,7 @@ namespace SGMG.Controllers
         private readonly ICitaService _citaService;
         private readonly IMedicoService _medicoService;
         private readonly ILogger<MedicoVistasController> _logger;
-
+ // Vista de subir detalles
         public MedicoVistasController(
             ICitaService citaService, 
             IMedicoService medicoService,
@@ -27,7 +27,7 @@ namespace SGMG.Controllers
             _medicoService = medicoService;
             _logger = logger;
         }
-
+ // Vista de subir detalles
         [HttpGet]
         [Route("/medico/pacientes-por-atender")]
         public async Task<IActionResult> PacientesPorAtender(string filtro = "")
