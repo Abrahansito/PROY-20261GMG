@@ -71,7 +71,7 @@ namespace SGMG.Controllers
     public IActionResult ForceError()
     {
       int x = 0;
-      int y = 5 / x; // Excepción
+      int y = 5 / x; 
       return Ok();
     }
   }
