@@ -1,7 +1,7 @@
 namespace SGMG.Dtos.Request
 {
     public class OrdenLaboratorioRequestDTO
-    {
+    { // Vista de subir detalles
         public int IdOrden { get; set; }
         public int IdPaciente { get; set; }
         public int IdMedico { get; set; }
