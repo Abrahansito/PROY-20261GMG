@@ -15,14 +15,12 @@ namespace SGMG.Controllers
             _consultaService = consultaService;
         }
 
-        // Vista principal
         [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
-        // API: Registrar consulta
         [HttpPost]
         [Route("/api/consulta/registrar")]
         public async Task<GenericResponse<ConsultaResponseDTO>> RegistrarConsulta([FromBody] ConsultaRequestDTO dto)
@@ -30,7 +28,6 @@ namespace SGMG.Controllers
             return await _consultaService.AddConsultaAsync(dto);
         }
 
-        // API: Actualizar consulta
         [HttpPut]
         [Route("/api/consulta/actualizar")]
         public async Task<GenericResponse<ConsultaResponseDTO>> ActualizarConsulta([FromBody] ConsultaRequestDTO dto)
@@ -38,7 +35,6 @@ namespace SGMG.Controllers
             return await _consultaService.UpdateConsultaAsync(dto);
         }
 
-        // API: Obtener consulta por ID
         [HttpGet]
         [Route("/api/consulta/{id}")]
         public async Task<GenericResponse<ConsultaResponseDTO>> ObtenerConsulta(int id)
