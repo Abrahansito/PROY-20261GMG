@@ -15,7 +15,7 @@ namespace SGMG.Controllers
       _context = context;
     }
 
-    // GET: HistorialDerivacion/Historial/5 (idCita)
+  
     [HttpGet]
     [Route("HistorialDerivacion/Historial")]
     public async Task<IActionResult> Historial(int idCita)
@@ -26,7 +26,7 @@ namespace SGMG.Controllers
         return RedirectToAction("Index", "Home");
       }
 
-      // Buscar la cita con el paciente
+    
       var cita = await _context.Citas
           .Include(c => c.Paciente)
           .FirstOrDefaultAsync(c => c.IdCita == idCita);
