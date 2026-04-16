@@ -27,14 +27,14 @@ namespace SGMG.Controllers
       _logger = logger;
       _medicoService = medicoService;
     }
-
+ // Vista de subir detalles
     [HttpGet]
     [Route("/medicos/all")]
     public async Task<GenericResponse<IEnumerable<Medico>>> GetAllMedicos()
     {
       return await _medicoService.GetAllMedicosAsync();
     }
-
+ // Vista de subir detalles
     [HttpGet]
     [Route("/medicos/{id}")]
     public async Task<GenericResponse<Medico>> GetMedicoById(int id)
