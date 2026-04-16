@@ -31,7 +31,7 @@ namespace SGMG.Controllers
       _citaService = citaService;
       _citaRepository = citaRepository;
     }
-
+// Indica que este controlador es de tipo API (validaciones automáticas, etc.)
     [HttpGet]
     public IActionResult Index()
     {
@@ -39,7 +39,6 @@ namespace SGMG.Controllers
     }
 
 
-    //Obtener todas las citas pendientes (sin filtros)
     [HttpGet]
     [Route("/citas/pendientes")]
     public async Task<GenericResponse<IEnumerable<CitaResponseDTO>>> GetCitasPendientes()
