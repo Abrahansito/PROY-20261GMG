@@ -19,7 +19,7 @@ namespace SGMG.Controllers
     private readonly ApplicationDbContext _context;
     private readonly ILogger<PagoController> _logger;
     private readonly ICitaRepository _citaRepository;
-
+ // Vista de subir detalles
     public PagoController(IPagoService pagoService, IPagoRepository pagoRepository, ApplicationDbContext context, ILogger<PagoController> logger, ICitaRepository citaRepository)
     {
       _pagoService = pagoService;
@@ -28,7 +28,7 @@ namespace SGMG.Controllers
       _logger = logger;
       _citaRepository = citaRepository;
     }
-
+ // Vista de subir detalles
     [HttpGet]
     [NoValidation]
     [Route("/pagos/all")]
