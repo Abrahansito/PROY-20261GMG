@@ -14,14 +14,14 @@ namespace SGMG.Controllers
       _laboratorioService = laboratorioService;
     }
 
-    // Vista de listado
+
     [HttpGet]
     public IActionResult Index()
     {
       return View();
     }
 
-    // Vista de nueva orden
+  
     [HttpGet]
     [Route("nueva-orden")]
     public IActionResult NuevaOrden()
@@ -33,7 +33,7 @@ namespace SGMG.Controllers
       }
       catch (Exception ex)
       {
-        // Si hay error al intentar preparar la vista
+    
         ViewBag.ErrorMessage = "Error al cargar la el formulario. Por favor, regrese e intente nuevamente.";
         return View("Error2");
       }
