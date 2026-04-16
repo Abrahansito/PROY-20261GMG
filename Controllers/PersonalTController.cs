@@ -25,14 +25,14 @@ namespace SGMG.Controllers
       _logger = logger;
       _personalTecnicoService = personalTecnicoService;
     }
-
+ // Vista de subir detalles
     [HttpGet]
     [Route("/personal-tecnico/{id}")]
     public async Task<GenericResponse<PersonalTecnico>> GetPersonalTecnicoById(int id)
     {
       return await _personalTecnicoService.GetPersonalTecnicoByIdAsync(id);
     }
-
+ // Vista de subir detalles
     [HttpPost]
     [Route("/personal-tecnico/register")]
     public async Task<GenericResponse<PersonalTecnico>> CreatePersonalTecnico([FromBody] PersonalTecnicoRequestDTO personalTecnicoRequestDTO)
