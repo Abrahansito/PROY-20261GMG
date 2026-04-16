@@ -16,19 +16,18 @@ namespace SGMG.Controllers
       _context = context;
     }
 
-    // GET: Derivacion/Create/5 (solo idCita)
     [HttpGet]
     [Route("Derivacion/Create/{idCita}")]
     public async Task<IActionResult> Create(int idCita)
     {
-      // Validar que el parámetro no esté vacío
+  
       if (idCita <= 0)
       {
         TempData["Error"] = "El ID de la cita es inválido.";
         return RedirectToAction("Index", "Home");
       }
 
-      // Buscar la cita con sus relaciones
+     
       var cita = await _context.Citas
           .Include(c => c.Paciente)
           .Include(c => c.Medico)
