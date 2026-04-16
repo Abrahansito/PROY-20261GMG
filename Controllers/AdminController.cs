@@ -18,7 +18,7 @@ namespace SGMG.Controllers
     {
       _logger = logger;
     }
-
+// Indica que este controlador es de tipo API (validaciones automáticas, etc.)
     public IActionResult Index()
     {
       return View();
