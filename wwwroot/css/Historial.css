@@ -1,0 +1,283 @@
+  * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Información del Paciente */
+        .patient-info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .patient-info-title {
+            color: #1e40af;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .patient-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .patient-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .patient-info-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .patient-info-value {
+            font-size: 15px;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        /* Historial de Triajes */
+        .triaje-history-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .triaje-history-header {
+            background: #f9fafb;
+            padding: 20px 24px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .triaje-history-title {
+            color: #374151;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .triaje-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .triaje-table thead {
+            background: #f9fafb;
+        }
+
+        .triaje-table th {
+            padding: 16px 24px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .triaje-table td {
+            padding: 16px 24px;
+            font-size: 14px;
+            color: #374151;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .triaje-table tbody tr {
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .triaje-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .btn-details {
+            background: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-details:hover {
+            background: #1e40af;
+        }
+
+        /* Detalles Expandibles */
+        .triaje-details {
+            display: none;
+            background: #f0f9ff;
+            padding: 24px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .triaje-details.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .details-title {
+            color: #1e40af;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .details-section {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .details-section-title {
+            color: #374151;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .details-row:last-child {
+            border-bottom: none;
+        }
+
+        .details-label {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .details-value {
+            color: #1f2937;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .observaciones {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .observaciones-title {
+            color: #374151;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .observaciones-text {
+            color: #4b5563;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Paginación */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 24px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .pagination-btn {
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .pagination-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .no-data {
+            padding: 60px 24px;
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        .no-data-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #2563eb;
+        }
+        
+
+        

@@ -1,0 +1,132 @@
+@{
+    ViewData["Title"] = "Consulta Médica";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Consulta.css" asp-append-version="true" />
+}
+
+    <div class="container">
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="cambiarTab('sintomas')" id="tab-sintomas">
+                <span class="tab-icon">📋</span>
+                Síntomas
+            </button>
+            <button class="tab" onclick="cambiarTab('diagnostico')" id="tab-diagnostico">
+                <span class="tab-icon">🩺</span>
+                Diagnóstico
+            </button>
+            <button class="tab" onclick="cambiarTab('evolucion')" id="tab-evolucion">
+                <span class="tab-icon">📊</span>
+                Evolución
+            </button>
+        </div>
+
+        <!-- Tab Content: Síntomas -->
+        <div class="tab-content active" id="content-sintomas">
+            <h2 class="form-title">Registro de Síntomas</h2>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    Motivo de Consulta <span class="required">*</span>
+                </label>
+                <textarea 
+                    class="form-textarea" 
+                    id="motivoConsulta"
+                    placeholder="Describa el motivo principal de la consulta..."
+                    required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Síntomas Presentados <span class="required">*</span>
+                </label>
+                <textarea 
+                    class="form-textarea" 
+                    id="sintomasPresentados"
+                    placeholder="Describa los síntomas que presenta el paciente..."
+                    required></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="volver()">Volver</button>
+                <button class="btn btn-primary" onclick="guardarSintomas()">Guardar Síntomas</button>
+            </div>
+        </div>
+
+        <!-- Tab Content: Diagnóstico -->
+        <div class="tab-content" id="content-diagnostico">
+            <h2 class="form-title">Registro de Diagnóstico</h2>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    Diagnóstico principal <span class="required">*</span>
+                </label>
+                <input 
+                    type="text" 
+                    class="form-input" 
+                    id="diagnosticoPrincipal"
+                    placeholder="Ej: Hipertensión arterial (I10)"
+                    required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Código CIE-10</label>
+                <input 
+                    type="text" 
+                    class="form-input" 
+                    id="codigoCie10"
+                    placeholder="Ej: I10, K29.5" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Observaciones <span class="required">*</span>
+                </label>
+                <textarea 
+                    class="form-textarea" 
+                    id="observaciones"
+                    placeholder="Describa detalles del diagnóstico, hallazgos relevantes, plan de tratamiento..."
+                    required></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="volver()">Volver</button>
+                <button class="btn btn-primary" onclick="guardarDiagnostico()">Guardar Diagnóstico</button>
+            </div>
+        </div>
+
+        <!-- Tab Content: Evolución -->
+        <div class="tab-content" id="content-evolucion">
+            <h2 class="form-title">Evolución del Paciente</h2>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    Descripción de la Evolución <span class="required">*</span>
+                </label>
+                <textarea 
+                    class="form-textarea" 
+                    id="descripcionEvolucion"
+                    placeholder="Describa la evolución del paciente, respuesta al tratamiento, cambios en los síntomas, exámenes realizados, ajustes en el plan terapéutico..."
+                    required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Indicaciones y Recomendaciones</label>
+                <textarea 
+                    class="form-textarea" 
+                    id="indicacionesRecomendaciones"
+                    placeholder="Indicaciones para el paciente, cuidados especiales, medicación..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="volver()">Volver</button>
+                <button class="btn btn-primary" onclick="guardarEvolucion()">Guardar Evolución</button>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    <script src="~/js/consulta.js"></script>
+}

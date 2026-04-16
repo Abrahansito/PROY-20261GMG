@@ -1,0 +1,196 @@
+@{
+    ViewData["Title"] = "Listado de Pacientes - Triaje";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Triaje.css" asp-append-version="true" />
+    <style>
+        .toast-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 300px;
+            max-width: 400px;
+            padding: 12px 16px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.3s ease-out;
+        }
+        .toast-error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .toast-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .toast-info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+        .toast-alert .close-toast {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.6;
+            padding: 0;
+            line-height: 1;
+        }
+        .toast-alert .close-toast:hover { opacity: 1; }
+    </style>
+}
+
+<div class="page-container">
+    <!-- Mostrar TempData si existe -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="toast-alert toast-error" id="tempDataToast">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>@TempData["ErrorMessage"]</span>
+            <button type="button" class="close-toast" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="toast-alert toast-success" id="tempDataToast">
+            <i class="fas fa-check-circle"></i>
+            <span>@TempData["SuccessMessage"]</span>
+            <button type="button" class="close-toast" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+    }
+
+    <div class="page-title-container">
+        <div class="bienvenida-card">
+            @if (ViewData["NombreEnfermera"] != null)
+            {
+                var nombre = ViewData["NombreEnfermera"].ToString();
+                var genero = ViewData["GeneroEnfermera"]?.ToString();
+                var saludo = genero == "F" ? "Bienvenida" : "Bienvenido";
+                var icono = genero == "F" ? "👩‍⚕️" : "👨‍⚕️";
+                var consultorioInfo = ViewData["ConsultorioInfo"]?.ToString();
+
+                <div class="bienvenida-contenido">
+                    <div class="bienvenida-texto">
+                        <span class="bienvenida-saludo">@saludo</span>  
+                        <span class="bienvenida-nombre">@nombre</span>  
+                        <span class="bienvenida-icono">@icono</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(consultorioInfo))
+                    {
+                        <div class="consultorio-info">
+                            <i class="fas fa-door-open"></i>
+                            <span>@consultorioInfo</span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<br>
+<h2>Listado de pacientes</h2>
+
+<!-- Tabs -->
+<div class="tabs-container">
+    <button class="tab-btn active" id="tab-por-triar" onclick="cambiarTab('por-triar')">
+        Pacientes por triar
+    </button>
+    <button class="tab-btn" id="tab-fuera-horario" onclick="cambiarTab('fuera-horario')">
+        Pacientes por triar (fuera de horario)
+    </button>
+    <button class="tab-btn" id="tab-triados" onclick="cambiarTab('triados')">
+        Pacientes ya triados
+    </button>
+</div>
+
+<!-- Búsqueda -->
+<div class="search-section">
+    <form id="formBusqueda" onsubmit="buscarPacientes(event)">
+        <div class="search-grid">
+            <div class="form-group">
+                <label for="tipoBusqueda">Tipo búsqueda <i class="fas fa-question-circle" title="Seleccione el tipo de documento"></i></label>
+                <select id="tipoBusqueda" name="tipoBusqueda">
+                    <option value="">Seleccione</option>
+                    <option value="DNI">DNI</option>
+                    <option value="CE">CE</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="numeroDocumento">Número documento</label>
+                <input type="text" id="numeroDocumento" name="numeroDocumento" placeholder="Ingrese número">
+            </div>
+            <div class="form-group" id="fechaInicioGroup">
+                <label for="fechaInicio">Inicio</label>
+                <input type="date" id="fechaInicio" name="fechaInicio">
+            </div>
+            <div class="form-group" id="fechaFinGroup">
+                <label for="fechaFin">Fin</label>
+                <input type="date" id="fechaFin" name="fechaFin">
+            </div>
+            <button type="submit" class="btn-search">
+                <i class="fas fa-search"></i>
+                Buscar
+            </button>
+            <button type="button" class="btn-clear" onclick="limpiarFiltros()">
+                <i class="fas fa-eraser"></i>
+                Limpiar
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Tabla -->
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Documento</th>
+                <th>Nombre paciente</th>
+                <th>Consultorio</th>
+                <th>Hora de cita</th>
+                <th>Fecha de cita</th>
+                <th>Médico</th>
+                <th id="columnAction">Acción</th>
+            </tr>
+        </thead>
+        <tbody id="tablaPacientesBody">
+            <tr>
+                <td colspan="7" class="no-data">Use los filtros para buscar pacientes</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Paginación -->
+<div class="pagination" id="paginacion" style="display:none;">
+    <button onclick="cambiarPagina('anterior')"><i class="fas fa-chevron-left"></i> Anterior</button>
+    <span id="paginaActual">1</span>
+    <button onclick="cambiarPagina('siguiente')">Siguiente <i class="fas fa-chevron-right"></i></button>
+</div>
+
+@section Scripts {
+    <script src="~/js/Triaje/listadoPaciente.js" asp-append-version="true"></script>
+    <script>
+        // Animar el toast del TempData
+        document.addEventListener('DOMContentLoaded', function() {
+            const toast = document.getElementById('tempDataToast');
+            if (toast) {
+                // Mostrar con animación
+                setTimeout(() => {
+                    toast.style.transform = 'translateX(0)';
+                    toast.style.opacity = '1';
+                }, 10);
+                
+                // Auto-cerrar después de 4 segundos
+                setTimeout(() => {
+                    toast.style.transform = 'translateX(400px)';
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 4000);
+            }
+        });
+    </script>
+}

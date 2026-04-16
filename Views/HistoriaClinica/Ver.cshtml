@@ -1,0 +1,71 @@
+@{
+    ViewData["Title"] = "Historial Clínico del Paciente";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/HistoriaClinica.css" asp-append-version="true" />
+}
+
+    <div class="container">
+        <!-- Información del Paciente -->
+        <div class="card">
+            <h2 class="card-title">Información del Paciente</h2>
+            <div id="patientInfo" class="patient-info">
+                <div class="loading">Cargando información del paciente...</div>
+            </div>
+        </div>
+
+        <!-- Acceso Rápido -->
+        <div class="card">
+            <h2 class="card-title">Acceso Rápido</h2>
+            <div class="quick-access">
+                <button class="access-btn" onclick="irARecetas()">
+                    📋 Recetas
+                </button>
+                <button class="access-btn" onclick="irALaboratorio()">
+                    🧪 Laboratorio
+                </button>
+                <button class="access-btn" onclick="irAConsulta()">
+                    🩺 Consulta
+                </button>
+                <button class="access-btn" onclick="irATriaje()">
+                    📊 Triaje
+                </button>
+                <button class="access-btn secondary" onclick="irACitas()">
+                    📅 Citas
+                </button>
+                <button class="access-btn secondary" onclick="irADerivaciones()">
+                    🔄 Derivaciones
+                </button>
+            </div>
+        </div>
+
+        <!-- Historial de Diagnósticos -->
+        <div class="card">
+            <h2 class="card-title">Historial de Diagnósticos</h2>
+            <div id="diagnosticsContainer">
+                <div class="loading">Cargando historial...</div>
+            </div>
+        </div>
+
+        <button class="btn-end-visit" onclick="terminarCita()">Terminar Cita</button>
+    </div>
+
+    <!-- Modal de Detalle -->
+    <div id="detailModal" class="detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Detalle del Diagnóstico</h3>
+                <button class="btn-close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div id="modalBody">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    <script src="~/js/historial-clinico.js"></script>
+}
+
+

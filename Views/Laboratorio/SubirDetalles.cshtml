@@ -1,0 +1,90 @@
+@{
+    ViewData["Title"] = "Subir Resultados del Examen";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/laboratorio.css" asp-append-version="true" />
+}
+
+<div class="container-resultados">
+    <h1 class="page-title">Subir Resultados del Examen</h1>
+
+    <div class="resultados-wrapper">
+        <!-- Panel Izquierdo: Información del Examen -->
+        <div class="info-panel">
+            <div class="info-card">
+                <div class="info-header">
+                    <span class="info-icon">📋</span>
+                    <h2 class="info-title">Información del Examen</h2>
+                </div>
+
+                <div id="ordenInfo" class="info-content">
+                    <div class="loading-info">Cargando información...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Derecho: Formulario de Resultados -->
+        <div class="form-panel">
+            <div class="form-card-resultados">
+                <div class="form-header-resultados">
+                    <span class="form-icon">📊</span>
+                    <h2 class="form-title-resultados">Resultados del Examen</h2>
+                </div>
+
+                <form id="formSubirResultados" onsubmit="guardarDetalles(event)">
+                    <!-- Resultados del Examen -->
+                    <div class="form-group-resultados">
+                        <label class="form-label-resultados">
+                            Resultados del Examen <span class="required">*</span>
+                        </label>
+                        <textarea 
+                            class="form-textarea-resultados" 
+                            id="resultados"
+                            rows="8"
+                            placeholder="Ingrese los resultados detallados del examen de laboratorio...
+
+Ejemplo:
+- Cultivo: Positivo para Escherichia coli
+- Recuento: 100,000 UFC/mL
+- Antibiograma: Sensible a Ciprofloxacina. Resistente a Ampicilina"
+                            required></textarea>
+                        <p class="form-help-resultados">
+                            Incluya todos los valores, mediciones y hallazgos relevantes del examen.
+                        </p>
+                    </div>
+
+                    <!-- Observaciones Adicionales -->
+                    <div class="form-group-resultados">
+                        <label class="form-label-resultados">
+                            Observaciones Adicionales
+                        </label>
+                        <textarea 
+                            class="form-textarea-resultados" 
+                            id="observacionesFinales"
+                            rows="4"
+                            placeholder="Agregue observaciones, recomendaciones o notas adicionales sobre los resultados..."></textarea>
+                        <p class="form-help-resultados">
+                            Campo opcional para agregar comentarios, interpretaciones o recomendaciones.
+                        </p>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="form-actions-resultados">
+                        <button type="button" class="btn-cancelar-resultados" onclick="volver()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-guardar-resultados">
+                            Guardar Resultados
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/laboratorio-subir-detalles.js" asp-append-version="true"></script>
+}

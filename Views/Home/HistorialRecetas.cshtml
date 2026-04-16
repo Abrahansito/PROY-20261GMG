@@ -1,0 +1,84 @@
+@{
+    ViewData["Title"] = "Historial de Recetas Médicas";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/historial-recetas.css" asp-append-version="true" />
+}
+
+<div class="historial-wrapper">
+    <!-- Header con información del hospital -->
+    <div class="hospital-header-recetas">
+        <div class="hospital-info-left">
+            <h1 class="hospital-name">Hospital Nacional Hipólito Unanue</h1>
+        </div>
+        <div class="hospital-info-right">
+            <span class="user-role">Médico</span>
+        </div>
+    </div>
+
+    <!-- Título y botón -->
+    <div class="page-header-recetas">
+        <h2 class="page-title-recetas">Historial de recetas médicas</h2>
+        <button type="button" class="btn-nueva-receta" id="btnNuevaReceta">
+            <i class="fas fa-plus"></i> Nueva Receta Médica
+        </button>
+    </div>
+
+    <!-- Contenido principal con dos paneles -->
+    <div class="content-grid-recetas">
+        <!-- Panel Izquierdo - Lista de Recetas -->
+        <div class="panel-izquierdo">
+            <div class="panel-header-recetas">
+                <h3 class="panel-title-recetas">Listado de recetas médicas</h3>
+            </div>
+
+            <div class="table-container-recetas">
+                <table class="tabla-recetas">
+                    <thead>
+                        <tr>
+                            <th>Fecha de emisión</th>
+                            <th>Código de receta</th>
+                            <th>Médico tratante</th>
+                            <th>Cant. med.</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recetasTableBody">
+                        <tr class="loading-row">
+                            <td colspan="5" class="text-center-recetas">
+                                <div class="loading-spinner-recetas"></div>
+                                <p>Cargando recetas...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Panel Derecho - Detalles de Receta -->
+        <div class="panel-derecho">
+            <div class="panel-header-recetas panel-header-detalles">
+                <h3 class="panel-title-recetas">Detalles de receta seleccionada</h3>
+                <button type="button" class="btn-cerrar-detalles" id="btnCloseDetails">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="detalles-content" id="detailsContent">
+                <div class="empty-state-recetas">
+                    <i class="fas fa-file-prescription"></i>
+                    <p>Seleccione una receta para ver sus detalles</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Datos ocultos del paciente -->
+<input type="hidden" id="idPaciente" value="@ViewBag.IdPaciente">
+
+@section Scripts {
+    <script src="~/js/historial-recetas.js" asp-append-version="true"></script>
+}

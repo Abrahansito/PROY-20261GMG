@@ -1,0 +1,19 @@
+﻿@page
+@model LogoutModel
+@{
+    ViewData["Title"] = "Cerrar Sesión";
+}
+
+<div style="text-align: center; padding: 50px;">
+    <h3>Cerrando sesión...</h3>
+    <p>Serás redirigido en un momento.</p>
+</div>
+
+@section Scripts {
+    <script>
+        // Redirigir automáticamente si no se hace por el servidor
+        setTimeout(function() {
+            window.location.href = '/Home/Index';
+        }, 1000);
+    </script>
+}

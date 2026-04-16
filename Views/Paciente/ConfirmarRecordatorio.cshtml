@@ -1,0 +1,415 @@
+@model dynamic
+
+@{
+    ViewData["Title"] = "Enviar Recordatorio de Cita por WhatsApp";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+@section Styles {
+    <style>
+        .recordatorio-container {
+            max-width: 700px;
+            margin: 30px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .recordatorio-header {
+            background: linear-gradient(135deg, #2e5cb8 0%, #1e3a8a 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .recordatorio-header h2 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .alerta-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: start;
+            gap: 10px;
+        }
+
+        .alerta-info i {
+            color: #2196f3;
+            font-size: 20px;
+            margin-top: 2px;
+        }
+
+        .alerta-info p {
+            margin: 0;
+            color: #1565c0;
+            font-size: 14px;
+        }
+
+        .seccion {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .seccion:last-child {
+            border-bottom: none;
+        }
+
+        .seccion-titulo {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .seccion-titulo i {
+            color: #2e5cb8;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .mensaje-preview {
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+            white-space: pre-line;
+        }
+
+        .mensaje-preview strong {
+            color: #000;
+        }
+
+        .hospital-info {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .hospital-nombre {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2e5cb8;
+            margin-bottom: 8px;
+        }
+
+        .hospital-telefono {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .hospital-telefono i {
+            color: #2e5cb8;
+        }
+
+        .acciones-container {
+            display: flex;
+            gap: 12px;
+            padding: 20px;
+            background: #fafafa;
+            justify-content: center;
+        }
+
+        .btn-accion {
+            padding: 12px 30px;
+            border-radius: 6px;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cancelar {
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+
+        .btn-cancelar:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .btn-enviar {
+            background: #25d366;
+            color: white;
+        }
+
+        .btn-enviar:hover {
+            background: #20ba5a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+
+        .badge-estado {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-confirmada {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+      
+    </style>
+}
+
+<div class="recordatorio-container">
+    <!-- Header -->
+    <div class="recordatorio-header">
+        <h2>
+            <i class="fas fa-paper-plane"></i>
+            Enviar Recordatorio de Cita
+        </h2>
+    </div>
+
+    <!-- Alerta Informativa -->
+    <div class="alerta-info">
+        <i class="fas fa-info-circle"></i>
+        <p><strong>Importante:</strong> Verifique que la información sea correcta antes de enviar el recordatorio por WhatsApp al paciente.</p>
+    </div>
+
+    <!-- Información del Paciente -->
+    <div class="seccion">
+        <div class="seccion-titulo">
+            <i class="fas fa-user"></i>
+            Información del Paciente
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Nombre Completo</span>
+                <span class="info-value">@Model.NombreCompletoPaciente</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">DNI</span>
+                <span class="info-value">@Model.Dni</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Teléfono</span>
+                <span class="info-value">@Model.Telefono</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Edad</span>
+                <span class="info-value">@Model.Edad años</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalles de la Cita -->
+    <div class="seccion">
+        <div class="seccion-titulo">
+            <i class="fas fa-calendar-check"></i>
+            Detalles de la Cita
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Fecha</span>
+                <span class="info-value">@Model.Fecha</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Hora</span>
+                <span class="info-value">@Model.Hora</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Médico</span>
+                <span class="info-value">@Model.Medico</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Consultorio</span>
+                <span class="info-value">Consultorio @Model.Consultorio</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Especialidad</span>
+                <span class="info-value">@Model.Especialidad</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Estado</span>
+                <span class="info-value">
+                    <span class="badge-estado badge-confirmada">@Model.Estado</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vista Previa del Mensaje -->
+    <div class="seccion">
+        <div class="seccion-titulo">
+            <i class="fas fa-eye"></i>
+            Vista Previa del Mensaje
+        </div>
+        <div class="mensaje-preview">@Html.Raw(Model.MensajeWhatsApp.Replace("\n", "<br>"))</div>
+    </div>
+
+    <!-- Información del Hospital -->
+    <div class="seccion">
+        <div class="hospital-info">
+            <div class="hospital-nombre">
+                <i class="fas fa-hospital"></i>
+                @Model.NombreHospital
+            </div>
+            <div class="hospital-telefono">
+                <i class="fas fa-phone"></i>
+                <span>Consultas: @Model.TelefonoHospital</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="acciones-container">
+        <button type="button" class="btn-accion btn-cancelar" onclick="cancelarEnvio()">
+            <i class="fas fa-times"></i>
+            Cancelar
+        </button>
+        <button type="button" class="btn-accion btn-enviar" onclick="enviarPorWhatsApp(@Model.IdCita)">
+            <i class="fab fa-whatsapp"></i>
+            Enviar por WhatsApp
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function cancelarEnvio() {
+            // Retornar a la página anterior sin realizar ninguna acción
+            window.history.back();
+        }
+
+       async function enviarPorWhatsApp(idCita) {
+            const btnEnviar = event.target.closest('button');
+            const originalHtml = btnEnviar.innerHTML;
+            
+            // Deshabilitar botón y mostrar loading
+            btnEnviar.disabled = true;
+            btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+            try {
+                const response = await fetch(`http://localhost:5122/pacientes/enviar-recordatorio-whatsapp/${idCita}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('No se pudo conectar con WhatsApp. Por favor, verifique su conexión a internet e inténtelo de nuevo.');
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Mostrar mensaje de éxito
+                    mostrarAlerta('✅ ' + result.message, 'success');
+                    
+                    // Cambiar el botón a estado "Enviado"
+                    btnEnviar.innerHTML = '<i class="fas fa-check-circle"></i> Mensaje Enviado';
+                    btnEnviar.style.background = '#4caf50';
+                    
+                    // NO redirigir - mantener en la página
+                } else {
+                    mostrarAlerta('❌ ' + result.message, 'error');
+                    btnEnviar.disabled = false;
+                    btnEnviar.innerHTML = originalHtml;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlerta('❌ No se pudo conectar con WhatsApp. Por favor, verifique su conexión a internet e inténtelo de nuevo.', 'error');
+                btnEnviar.disabled = false;
+                btnEnviar.innerHTML = originalHtml;
+            }
+        }
+
+        function mostrarAlerta(mensaje, tipo) {
+            const alertaDiv = document.createElement('div');
+            alertaDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                font-size: 14px;
+                font-weight: 500;
+                max-width: 400px;
+                animation: slideIn 0.3s ease;
+            `;
+
+            if (tipo === 'success') {
+                alertaDiv.style.background = '#4caf50';
+                alertaDiv.style.color = 'white';
+            } else {
+                alertaDiv.style.background = '#f44336';
+                alertaDiv.style.color = 'white';
+            }
+
+            alertaDiv.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span>${mensaje}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; margin-left: auto;">
+                        ×
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(alertaDiv);
+
+            setTimeout(() => {
+                alertaDiv.remove();
+            }, 5000);
+        }
+    </script>
+}

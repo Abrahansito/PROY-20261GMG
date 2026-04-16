@@ -1,0 +1,197 @@
+@model IEnumerable<SGMG.Dtos.Response.PagoResponseDTO>
+@{
+    ViewData["Title"] = "Historial de Pago de Citas";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+
+    // Valores de querystring (seguros)
+    var q = ViewContext.HttpContext.Request.Query;
+    string tipoBusquedaVal = q["tipoBusqueda"].ToString();
+    string numeroDocumentoVal = q["numeroDocumento"].ToString();
+    string inicioVal = q["inicio"].ToString();
+    string finVal = q["fin"].ToString();
+    string selectedEstado = q["estado"].ToString();
+    // Helper para selected en el select tipoBusqueda (evita C# dentro del atributo)
+    var selTipoDni = tipoBusquedaVal == "DNI" ? "selected" : "";
+    var selTipoRuc = tipoBusquedaVal == "RUC" ? "selected" : "";
+    var selTipoPas = tipoBusquedaVal == "Pasaporte" ? "selected" : "";
+}
+
+<style>
+    /* Estilos locales para la vista Historial */
+    .search-card { background: #fff; border-radius: 8px; padding: 18px; box-shadow: 0 6px 18px rgba(31,45,61,0.08); }
+    .search-card .form-label { font-weight:600; font-size:0.9rem; }
+    .btn-pink { background: #ff4fa1; color: #fff; border: none; }
+    .btn-pink:hover { background: #ff2f86; color: #fff; }
+    .table thead th { font-weight:700; }
+    .table tbody td { vertical-align: middle; }
+    .estado-pendiente { color: #ff7a59; font-weight:600; }
+    .estado-cancelado { color: #22c55e; font-weight:600; }
+    .estado-pagado { color: #0ea5e9; font-weight:600; }
+    .filters-row { gap: 10px; }
+</style>
+
+<div class="container mt-4">
+        <h2>Buscar Órdenes</h2>
+
+        <div class="search-card mb-4">
+            <form id="form-filtros" method="get" class="row g-3 filters-row align-items-end">
+        <div class="col-md-2">
+            <label class="form-label">Tipo búsqueda</label>
+            <select name="tipoBusqueda" class="form-control">
+                @if (selTipoDni == "selected")
+                {
+                    <option value="DNI" selected>DNI</option>
+                }
+                else
+                {
+                    <option value="DNI">DNI</option>
+                }
+
+                @if (selTipoRuc == "selected")
+                {
+                    <option value="RUC" selected>CE</option>
+                }
+                else
+                {
+                    <option value="RUC">CE</option>
+                }
+
+                
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Número documento</label>
+            <input type="text" name="numeroDocumento" class="form-control" value="@numeroDocumentoVal" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Inicio</label>
+            <input type="date" name="inicio" class="form-control" value="@inicioVal" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Fin</label>
+            <input type="date" name="fin" class="form-control" value="@finVal" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Estado</label>
+            <select name="estado" class="form-control">
+                @if (string.IsNullOrEmpty(selectedEstado) || selectedEstado == "Todos")
+                {
+                    <option value="Todos" selected>Todos los estados</option>
+                }
+                else
+                {
+                    <option value="Todos">Todos los estados</option>
+                }
+                @if (selectedEstado == "Pendiente")
+                {
+                    <option value="Pendiente" selected>Pendiente</option>
+                }
+                else
+                {
+                    <option value="Pendiente">Pendiente</option>
+                }
+                @if (selectedEstado == "Cancelado")
+                {
+                    <option value="Cancelado" selected>Cancelado</option>
+                }
+                else
+                {
+                    <option value="Cancelado">Cancelado</option>
+                }
+                @if (selectedEstado == "Pagado")
+                {
+                    <option value="Pagado" selected>Pagado</option>
+                }
+                else
+                {
+                    <option value="Pagado">Pagado</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2" style="background:#1572ff;border:none;">Buscar</button>
+            <button type="button" id="btn-limpiar" class="btn btn-pink">Limpiar</button>
+        </div>
+            </form>
+        </div>
+
+    <h3>Citas</h3>
+
+    <div class="table-responsive">
+        <table id="tabla-pagos" class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr style="color: #788a92;">
+                    <th >#</th>
+                    <th>N° Pago</th>
+                    <th>Fecha Registro</th>
+                    <th>Fecha</th>
+                    <th>Cita</th>
+                    <th>Tipo y N° Doc</th>
+                    <th>Apellidos y Nombres</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model == null || !Model.Any())
+                {
+                    <tr><td colspan="10" class="text-center">No hay registros</td></tr>
+                }
+                else
+                {
+                    var i = 1;
+                    foreach (var pago in Model)
+                    {
+                        var horaStr = !string.IsNullOrWhiteSpace(pago?.HoraCita) ? pago.HoraCita : "-";
+                        <tr>
+                            <td>@i</td>
+                            <td>@(pago?.Id ?? 0)</td>
+                            <td>@(pago?.FechaPago ?? "-")</td>
+                            <td>@(pago?.FechaCita ?? "-")</td>
+                            <td>@horaStr</td>
+                            <td>@(!string.IsNullOrWhiteSpace(pago?.TipoDoc) ? pago.TipoDoc + " - " + pago.NumeroDoc : "-")</td>
+                            <td>@(string.IsNullOrWhiteSpace(pago?.Nombres) ? "-" : pago.Nombres)</td>
+                            <td>@(pago != null ? pago.Total.ToString("F2") : "0.00")</td>
+                            <td>
+                                @switch (pago?.Estado)
+                                {
+                                    case "Pendiente":
+                                        <text><span class="text-warning">Pendiente</span></text>
+                                        break;
+                                    case "Cancelado":
+                                        <text><span class="text-success">Cancelado</span></text>
+                                        break;
+                                    case "Pagado":
+                                        <text><span class="text-primary">Pagado</span></text>
+                                        break;
+                                    default:
+                                        <text><span>-</span></text>
+                                        break;
+                                }
+                            </td>
+                            <td>
+                                @if (pago?.Estado == "Pendiente")
+                                {
+                                    <a href="resumen/@(pago?.Id)" class="btn btn-primary btn-sm">Pagar cita</a>
+                                }
+                                else
+                                {
+                                    <a href="resumen/@(pago?.Id)" class="btn btn-info btn-sm">Detalles</a>
+                                }
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="/js/pagos-historial.js"></script>

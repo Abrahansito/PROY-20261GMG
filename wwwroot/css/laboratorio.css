@@ -1,0 +1,768 @@
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Información del Paciente */
+        .patient-info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .patient-info-title {
+            color: #1e40af;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .patient-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .patient-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .patient-info-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .patient-info-value {
+            font-size: 15px;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        /* Órdenes de Laboratorio */
+        .orders-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .orders-header {
+            background: #f9fafb;
+            padding: 20px 24px;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .orders-title {
+            color: #1e40af;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .btn-new-order {
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-new-order:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .orders-table thead {
+            background: #f9fafb;
+        }
+
+        .orders-table th {
+            padding: 16px 24px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .orders-table td {
+            padding: 16px 24px;
+            font-size: 14px;
+            color: #374151;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .orders-table tbody tr {
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .orders-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .badge-realizado {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-pendiente {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-cancelado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-details {
+            background: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 8px;
+        }
+
+        .btn-details:hover {
+            background: #1e40af;
+        }
+
+        .btn-cancel, .btn-complete {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #dc2626;
+        }
+
+        .btn-complete {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-complete:hover {
+            background: #059669;
+        }
+
+        /* Detalles Expandibles */
+        .order-details {
+            display: none;
+            background: #f0f9ff;
+            padding: 24px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .order-details.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .details-title {
+            color: #1e40af;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .details-section {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .details-section-title {
+            color: #374151;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .details-row:last-child {
+            border-bottom: none;
+        }
+
+        .details-label {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .details-value {
+            color: #1f2937;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .no-data {
+            padding: 60px 24px;
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        .no-data-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #2563eb;
+        }
+
+
+/* Botones de acciones */
+.btn-cancel {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    margin-right: 8px;
+}
+
+.btn-cancel:hover {
+    background-color: #dc2626;
+}
+
+.btn-upload {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn-upload:hover {
+    background-color: #059669;
+}
+
+.text-muted {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+
+        /*Formulario de Nueva Orden*/
+       * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Información del Paciente */
+        .patient-info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .patient-info-title {
+            color: #1e40af;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .patient-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .patient-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .patient-info-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .patient-info-value {
+            font-size: 15px;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        /* Formulario */
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-title {
+            color: #1e40af;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-help {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid #f3f4f6;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-primary {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #2563eb;
+        }
+
+/*Subir detalle*/
+
+/* Contenedor Principal */
+.container-resultados {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-bottom: 24px;
+}
+
+/* Layout de dos columnas */
+.resultados-wrapper {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 24px;
+}
+
+/* Panel de Información (Izquierda) */
+.info-panel {
+    position: sticky;
+    top: 24px;
+    align-self: start;
+}
+
+.info-card {
+    background: white;
+    border-radius: 12px;
+    border-left: 4px solid #1e40af;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.info-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.info-icon {
+    font-size: 24px;
+}
+
+.info-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e40af;
+    margin: 0;
+}
+
+.info-content {
+    padding: 20px;
+}
+
+.loading-info {
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+}
+
+.info-item {
+    margin-bottom: 20px;
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+}
+
+.info-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.info-value {
+    display: block;
+    font-size: 15px;
+    color: #1e293b;
+    line-height: 1.5;
+}
+
+.info-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+/* Panel de Formulario (Derecha) */
+.form-panel {
+    min-height: 500px;
+}
+
+.form-card-resultados {
+    background: white;
+    border-radius: 12px;
+    border-left: 4px solid #f59e0b;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.form-header-resultados {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    background: #fffbeb;
+    border-bottom: 1px solid #fde68a;
+}
+
+.form-icon {
+    font-size: 24px;
+}
+
+.form-title-resultados {
+    font-size: 18px;
+    font-weight: 600;
+    color: #92400e;
+    margin: 0;
+}
+
+/* Formulario */
+#formSubirResultados {
+    padding: 24px;
+}
+
+.form-group-resultados {
+    margin-bottom: 24px;
+}
+
+.form-label-resultados {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.required {
+    color: #ef4444;
+}
+
+.form-textarea-resultados {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-textarea-resultados:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-textarea-resultados::placeholder {
+    color: #9ca3af;
+}
+
+.form-help-resultados {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+/* Botones de Acción */
+.form-actions-resultados {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-cancelar-resultados {
+    padding: 12px 24px;
+    background-color: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-cancelar-resultados:hover {
+    background-color: #4b5563;
+}
+
+.btn-guardar-resultados {
+    padding: 12px 24px;
+    background-color: #1e40af;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-guardar-resultados:hover {
+    background-color: #1e3a8a;
+}
+
+/* Responsivo */
+@media (max-width: 1024px) {
+    .resultados-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .info-panel {
+        position: static;
+    }
+}
+
+@media (max-width: 640px) {
+    .container-resultados {
+        padding: 16px;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+
+    .form-actions-resultados {
+        flex-direction: column;
+    }
+
+    .btn-cancelar-resultados,
+    .btn-guardar-resultados {
+        width: 100%;
+    }
+}
+
+
+
+        

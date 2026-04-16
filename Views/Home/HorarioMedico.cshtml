@@ -1,0 +1,1335 @@
+@{
+    ViewData["Title"] = "Horario del Médico";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+<style>
+  /* ============================================
+     CALENDARIO MÉDICO - DISEÑO PROFESIONAL
+     ============================================ */
+  
+  /* Variables del calendario - Alineadas con navbar */
+  .cal-wrapper {
+    --cal-primary: #2c3e50;
+    --cal-primary-light: #34495e;
+    --cal-accent: #3498db;
+    --cal-success: #27ae60;
+    --cal-success-light: #2ecc71;
+    --cal-danger: #e74c3c;
+    --cal-danger-light: #ec7063;
+    --cal-warning: #f39c12;
+    --cal-warning-light: #f5b041;
+    --cal-info: #3498db;
+    --cal-info-light: #5dade2;
+    --cal-gray-50: #f8f9fa;
+    --cal-gray-100: #ecf0f1;
+    --cal-gray-200: #d5dbdb;
+    --cal-gray-300: #bdc3c7;
+    --cal-gray-400: #95a5a6;
+    --cal-gray-500: #7f8c8d;
+    --cal-gray-600: #626567;
+    --cal-gray-700: #34495e;
+    --cal-gray-800: #2c3e50;
+    --cal-gray-900: #1c2833;
+    --cal-white: #ffffff;
+    --cal-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --cal-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --cal-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+    --cal-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --cal-shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  /* Contenedor principal del calendario */
+  .cal-wrapper {
+    padding: 0;
+    max-width: 100%;
+    margin: 0;
+    background: var(--cal-gray-50);
+  }
+
+  /* Tarjeta del calendario */
+  .cal-card {
+    background: var(--cal-white);
+    border-radius: 8px;
+    box-shadow: var(--cal-shadow);
+    overflow: hidden;
+    margin: 20px;
+  }
+
+  /* Header del calendario */
+  .cal-header {
+    background: var(--cal-primary);
+    padding: 20px 30px;
+    color: var(--cal-white);
+    border-bottom: 3px solid var(--cal-accent);
+  }
+
+  .cal-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .cal-title-section {
+    flex: 1;
+    min-width: 250px;
+  }
+
+  .cal-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+    letter-spacing: -0.02em;
+  }
+
+  .cal-subtitle {
+    font-size: 14px;
+    opacity: 0.9;
+    font-weight: 400;
+  }
+
+  /* Controles de navegación */
+  .cal-nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 15px;
+    border-radius: 8px;
+  }
+
+  .cal-nav-btn {
+    background: var(--cal-white);
+    color: var(--cal-primary);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: var(--cal-shadow-sm);
+  }
+
+  .cal-nav-btn:hover {
+    background: var(--cal-accent);
+    color: var(--cal-white);
+    transform: translateY(-1px);
+    box-shadow: var(--cal-shadow-md);
+  }
+
+  .cal-nav-btn:active {
+    transform: translateY(0);
+  }
+
+  .cal-week-info {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cal-white);
+    padding: 0 10px;
+    white-space: nowrap;
+  }
+
+  /* Cuerpo del calendario */
+  .cal-body {
+    padding: 0;
+  }
+
+  /* Grid del calendario */
+  .cal-grid-wrapper {
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
+  .cal-grid {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+  }
+
+  /* Encabezado de días */
+  .cal-grid thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .cal-grid th {
+    background: var(--cal-gray-100);
+    padding: 15px 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--cal-gray-700);
+    border-bottom: 2px solid var(--cal-gray-300);
+    border-right: 1px solid var(--cal-gray-200);
+  }
+
+  .cal-grid th:first-child {
+    background: var(--cal-gray-200);
+    color: var(--cal-gray-800);
+    font-weight: 700;
+    position: sticky;
+    left: 0;
+    z-index: 11;
+    min-width: 80px;
+    max-width: 80px;
+    width: 80px;
+  }
+
+  .cal-grid th:last-child {
+    border-right: none;
+  }
+
+  .cal-day-name {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+    color: var(--cal-gray-800);
+  }
+
+  .cal-day-date {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cal-gray-700);
+  }
+
+  /* Celdas de tiempo */
+  .cal-time-cell {
+    background: var(--cal-gray-100);
+    padding: 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cal-gray-700);
+    border-right: 1px solid var(--cal-gray-200);
+    border-bottom: 1px solid var(--cal-gray-200);
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    white-space: nowrap;
+    min-width: 80px;
+    max-width: 80px;
+    width: 80px;
+  }
+
+  /* Celdas de slots */
+  .cal-grid td {
+    padding: 2px;
+    border-right: 1px solid var(--cal-gray-200);
+    border-bottom: 1px solid var(--cal-gray-200);
+    background: var(--cal-white);
+    height: 50px;
+    position: relative;
+  }
+
+  .cal-grid td:last-child {
+    border-right: none;
+  }
+
+  .cal-grid tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Slots de citas */
+  .cal-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    font-size: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Slot disponible */
+  .cal-slot-available {
+    background: var(--cal-white);
+    color: var(--cal-gray-400);
+    border: 1px solid var(--cal-gray-200);
+  }
+
+  .cal-slot-available:hover {
+    background: var(--cal-accent);
+    color: var(--cal-white);
+    transform: scale(1.05);
+    box-shadow: var(--cal-shadow-md);
+    border-color: var(--cal-accent);
+    z-index: 2;
+  }
+
+  .cal-slot-available:active {
+    transform: scale(0.98);
+  }
+
+  /* Slot ocupado */
+  .cal-slot-occupied {
+    background: var(--cal-danger);
+    color: var(--cal-white);
+    cursor: not-allowed;
+    opacity: 0.9;
+  }
+
+  .cal-slot-occupied:hover {
+    transform: none;
+    opacity: 1;
+  }
+
+  /* Slot vacío */
+  .cal-slot-empty {
+    background: var(--cal-gray-50);
+    color: var(--cal-gray-300);
+    cursor: default;
+    border: 1px solid var(--cal-gray-200);
+  }
+
+  .cal-slot-empty:hover {
+    transform: none;
+  }
+
+  /* Leyenda */
+  .cal-legend {
+    display: flex;
+    gap: 30px;
+    padding: 20px 30px;
+    background: var(--cal-white);
+    border-top: 1px solid var(--cal-gray-200);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cal-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cal-legend-color {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--cal-white);
+    box-shadow: var(--cal-shadow-sm);
+  }
+
+  .cal-legend-color.available {
+    background: var(--cal-white);
+    border: 2px solid var(--cal-gray-300);
+    color: var(--cal-gray-400);
+  }
+
+  .cal-legend-color.occupied {
+    background: var(--cal-danger);
+  }
+
+  .cal-legend-color.empty {
+    background: var(--cal-gray-100);
+    border: 1px solid var(--cal-gray-300);
+    color: var(--cal-gray-400);
+  }
+
+  .cal-legend-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--cal-gray-700);
+  }
+
+  /* Estados de carga y error */
+  .cal-loading,
+  .cal-error {
+    text-align: center;
+    padding: 60px 30px;
+    color: var(--cal-gray-500);
+  }
+
+  .cal-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .cal-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--cal-gray-200);
+    border-top-color: var(--cal-accent);
+    border-radius: 50%;
+    animation: cal-spin 0.8s linear infinite;
+  }
+
+ 
+
+  .cal-error {
+    background: #fef2f2;
+    border: 1px solid var(--cal-danger-light);
+    border-radius: 8px;
+    color: var(--cal-danger);
+    margin: 20px;
+  }
+
+  /* ============================================
+     MODAL DE CITA
+     ============================================ */
+  
+  .cal-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(44, 62, 80, 0.7);
+    overflow: auto;
+    animation: cal-modal-fade-in 0.2s ease;
+  }
+
+  
+
+  .cal-modal.show {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .cal-modal-content {
+    background: var(--cal-white) !important;
+    background-color: #ffffff !important;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--cal-shadow-xl);
+    animation: cal-modal-slide-up 0.3s ease;
+    opacity: 1 !important;
+  }
+
+  
+
+  .cal-modal-header {
+    padding: 25px 30px;
+    background: var(--cal-primary);
+    color: var(--cal-white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .cal-modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .cal-modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: var(--cal-white);
+    font-size: 24px;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .cal-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+  }
+
+  .cal-modal-body {
+    padding: 30px;
+  }
+
+  .cal-modal-section {
+    background: var(--cal-gray-50);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--cal-accent);
+  }
+
+  .cal-modal-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .cal-modal-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--cal-gray-900);
+    margin: 0 0 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cal-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+  }
+
+  .cal-info-item {
+    background: var(--cal-white);
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: var(--cal-shadow-sm);
+    transition: all 0.2s ease;
+  }
+
+  .cal-info-item:hover {
+    box-shadow: var(--cal-shadow);
+    transform: translateY(-1px);
+  }
+
+  .cal-info-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cal-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 5px;
+  }
+.cal-info-value {
+  font-size: 14px;
+  color: #1c2833;
+  font-weight: 600;
+}
+
+.cal-modal-footer {
+  padding: 25px 30px;
+  background: #ffffff;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-radius: 0 0 12px 12px;
+  border-top: 1px solid #ecf0f1;
+}
+
+.cal-modal-footer .cal-btn {
+  padding: 12px 28px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  outline: none;
+  text-decoration: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0.02em;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.cal-modal-footer .cal-btn-cancel {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #2c3e50 !important;
+  border: 2px solid #d5dbdb !important;
+}
+
+.cal-modal-footer .cal-btn-cancel:hover {
+  background-color: #ecf0f1 !important;
+  background-image: none !important;
+  border-color: #bdc3c7 !important;
+  color: #1c2833 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.cal-modal-footer .cal-btn-cancel:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.cal-modal-footer .cal-btn-confirm {
+  background: linear-gradient(180deg, #27ae60 0%, #229954 100%) !important;
+  background-image: linear-gradient(180deg, #27ae60 0%, #229954 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 2px 6px rgba(39, 174, 96, 0.35) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.cal-modal-footer .cal-btn-confirm::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.cal-modal-footer .cal-btn-confirm:hover::before {
+  left: 100%;
+}
+
+.cal-modal-footer .cal-btn-confirm:hover {
+  background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%) !important;
+  background-image: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4) !important;
+}
+
+.cal-modal-footer .cal-btn-confirm:active {
+  transform: translateY(0);
+  background: linear-gradient(180deg, #229954 0%, #1e8449 100%) !important;
+  background-image: linear-gradient(180deg, #229954 0%, #1e8449 100%) !important;
+  box-shadow: 0 1px 4px rgba(39, 174, 96, 0.3) !important;
+}
+
+/* Iconos para los botones (opcional) */
+.cal-modal-footer .cal-btn-cancel::before {
+  content: '✕';
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.cal-modal-footer .cal-btn-confirm::after {
+  content: '✓';
+  font-size: 14px;
+  font-weight: 700;
+  margin-left: 4px;
+}
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+   .toast-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 300px;
+    max-width: 400px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateX(400px);
+    opacity: 0;
+    transition: all 0.3s ease-out;
+  }
+  .toast-error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+  .toast-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+  .toast-info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+  .toast-alert .close-toast {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0.6;
+    padding: 0;
+    line-height: 1;
+  }
+</style>
+<div id="toastContainer"></div>
+<div class="cal-wrapper">
+  <div class="cal-card">
+    <!-- Header -->
+    <div class="cal-header">
+      <div class="cal-header-content">
+        <div class="cal-title-section">
+          <h1 class="cal-title" id="calTitulo">Horario del Médico</h1>
+          <p class="cal-subtitle" id="calSubtitulo">Seleccione un horario disponible</p>
+        </div>
+        <div class="cal-nav-controls">
+          <button class="cal-nav-btn" id="calBtnAnterior">
+            <span>←</span>
+            <span>Anterior</span>
+          </button>
+          <span class="cal-week-info" id="calSemanaInfo">Semana Actual</span>
+          <button class="cal-nav-btn" id="calBtnSiguiente">
+            <span>Siguiente</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="cal-body">
+      <div id="calContenido">
+        <div class="cal-loading">
+          <div class="cal-spinner"></div>
+          <p>Cargando calendario...</p>
+        </div>
+      </div>
+
+      <!-- Leyenda -->
+      <div class="cal-legend">
+        <div class="cal-legend-item">
+          <div class="cal-legend-color available"></div>
+          <span class="cal-legend-text">Disponible</span>
+        </div>
+        <div class="cal-legend-item">
+          <div class="cal-legend-color occupied">✗</div>
+          <span class="cal-legend-text">Ocupado</span>
+        </div>
+        <div class="cal-legend-item">
+          <div class="cal-legend-color empty">—</div>
+          <span class="cal-legend-text">No Asignado</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div id="calModal" class="cal-modal">
+  <div class="cal-modal-content">
+    <div class="cal-modal-header">
+      <h2 class="cal-modal-title">📋 Reserva de Cita Médica</h2>
+      <button class="cal-modal-close" onclick="calCerrarModal()">&times;</button>
+    </div>
+    <div class="cal-modal-body">
+      <!-- Información de la Cita -->
+      <div class="cal-modal-section">
+        <h3 class="cal-modal-section-title">📅 Resumen de la Cita</h3>
+        <div class="cal-info-grid">
+          <div class="cal-info-item">
+            <div class="cal-info-label">Médico</div>
+            <div class="cal-info-value" id="calModalMedico">-</div>
+          </div>
+          <div class="cal-info-item">
+            <div class="cal-info-label">Especialidad</div>
+            <div class="cal-info-value">Medicina General</div>
+          </div>
+          <div class="cal-info-item">
+            <div class="cal-info-label">Fecha</div>
+            <div class="cal-info-value" id="calModalFecha">-</div>
+          </div>
+          <div class="cal-info-item">
+            <div class="cal-info-label">Hora</div>
+            <div class="cal-info-value" id="calModalHora">-</div>
+          </div>
+          <div class="cal-info-item">
+            <div class="cal-info-label">Consultorio</div>
+            <div class="cal-info-value" id="calModalConsultorio">-</div>
+          </div>
+          <div class="cal-info-item">
+            <div class="cal-info-label">Duración</div>
+            <div class="cal-info-value">20 minutos</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información del Paciente -->
+      <div class="cal-modal-section">
+        <h3 class="cal-modal-section-title">👤 Datos del Paciente</h3>
+        <div class="cal-info-grid">
+          <div class="cal-info-item">
+            <div class="cal-info-label">DNI</div>
+            <div class="cal-info-value" id="calModalPacienteDni">-</div>
+          </div>
+          <div class="cal-info-item">
+            <div class="cal-info-label">Historia Clínica</div>
+            <div class="cal-info-value" id="calModalPacienteHC">-</div>
+          </div>
+          <div class="cal-info-item">
+            <div class="cal-info-label">Nombre Completo</div>
+            <div class="cal-info-value" id="calModalPacienteNombre">-</div>
+          </div>
+          <div class="cal-info-item">
+            <div class="cal-info-label">Edad</div>
+            <div class="cal-info-value" id="calModalPacienteEdad">-</div>
+          </div>
+          <div class="cal-info-item">
+            <div class="cal-info-label">Teléfono</div>
+            <div class="cal-info-value" id="calModalPacienteTelefono">-</div>
+          </div>
+          <div class="cal-info-item">
+            <div class="cal-info-label">Correo Electrónico</div>
+            <div class="cal-info-value" id="calModalPacienteCorreo">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cal-modal-footer">
+      <button class="cal-btn cal-btn-cancel" onclick="calCerrarModal()">Cancelar</button>
+      <button class="cal-btn cal-btn-confirm" onclick="calConfirmarCita()">Confirmar Cita</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// VARIABLES GLOBALES DEL CALENDARIO
+// ============================================
+let calSemanaActual = @ViewBag.Semana;
+const calIdMedico = @ViewBag.IdMedico;
+const calIdPaciente = @(ViewBag.IdPaciente ?? "null");
+const calIdCita = @(ViewBag.IdCita ?? "null");
+let calDatosModal = {};
+
+// ============================================
+// INICIALIZACIÓN
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 Calendario Médico Iniciado');
+  console.log('   → Semana:', calSemanaActual);
+  console.log('   → ID Médico:', calIdMedico);
+  console.log('   → ID Paciente:', calIdPaciente);
+  console.log('   → ID Cita:', calIdCita);
+  
+  // Mostrar mensaje si es reprogramación
+  if (calIdCita && calIdCita !== 'null') {
+    console.log('📝 Modo: REPROGRAMAR CITA');
+    if (typeof showAlert !== 'undefined') {
+      showAlert(`Reprogramando cita #${calIdCita}`, 'info');
+    }
+  }
+  
+  calCargarCalendario();
+
+  // Event Listeners
+  document.getElementById('calBtnSiguiente').addEventListener('click', function() {
+    calSemanaActual++;
+    calCargarCalendario();
+  });
+
+  document.getElementById('calBtnAnterior').addEventListener('click', function() {
+    calSemanaActual--;
+    calCargarCalendario();
+  });
+
+  // Cerrar modal al hacer click fuera
+  window.addEventListener('click', function(event) {
+    const modal = document.getElementById('calModal');
+    if (event.target === modal) {
+      calCerrarModal();
+    }
+  });
+});
+
+// ============================================
+// CARGAR CALENDARIO
+// ============================================
+function calCargarCalendario() {
+  console.log('🔄 Cargando calendario...');
+  
+  const contenido = document.getElementById('calContenido');
+  contenido.innerHTML = `
+    <div class="cal-loading">
+      <div class="cal-spinner"></div>
+      <p>Cargando calendario...</p>
+    </div>
+  `;
+
+  const url = `/Cita/ObtenerDatosCalendario?idMedico=${calIdMedico}&semana=${calSemanaActual}`;
+  
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        contenido.innerHTML = `<div class="cal-error">${data.mensaje}</div>`;
+        return;
+      }
+
+      calActualizarInfoSemana(data);
+      calGenerarCalendario(data);
+    })
+    .catch(error => {
+      console.error('❌ Error:', error);
+      contenido.innerHTML = '<div class="cal-error">Error al cargar el calendario</div>';
+    });
+}
+
+// ============================================
+// ACTUALIZAR INFORMACIÓN DE SEMANA
+// ============================================
+function calActualizarInfoSemana(data) {
+  const textoSemana = calSemanaActual === 0 ? 'Semana Actual' :
+                     calSemanaActual === 1 ? 'Siguiente Semana' :
+                     calSemanaActual > 1 ? `En ${calSemanaActual} Semanas` :
+                     calSemanaActual === -1 ? 'Semana Pasada' :
+                     `Hace ${Math.abs(calSemanaActual)} Semanas`;
+  
+  document.getElementById('calSemanaInfo').textContent = textoSemana;
+  document.getElementById('calTitulo').textContent = `Dr. ${data.medicoNombre}`;
+  
+  // Cambiar subtítulo si es reprogramación
+  if (calIdCita && calIdCita !== 'null') {
+    document.getElementById('calSubtitulo').textContent = `Turno ${data.turno} - Reprogramando cita #${calIdCita}`;
+  } else {
+    document.getElementById('calSubtitulo').textContent = `Turno ${data.turno} - Seleccione un horario disponible`;
+  }
+}
+
+// ============================================
+// GENERAR CALENDARIO
+// ============================================
+function calGenerarCalendario(data) {
+  const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  const fechas = data.fechasSemana;
+  
+  let html = '<div class="cal-grid-wrapper"><table class="cal-grid">';
+  
+  // Encabezado
+  html += '<thead><tr><th>Horario</th>';
+  dias.forEach((dia, idx) => {
+    html += `<th>
+      <span class="cal-day-name">${dia.substring(0, 3).toUpperCase()}</span>
+      <span class="cal-day-date">${calFormatearFechaCorta(fechas[idx])}</span>
+    </th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  // Generar horarios
+  const horarios = calGenerarHorarios(data.turno);
+  
+  horarios.forEach(horario => {
+    html += '<tr>';
+    html += `<td class="cal-time-cell">${horario.texto}</td>`;
+    
+    dias.forEach((dia, idx) => {
+      const fecha = fechas[idx];
+      const horaInicio = horario.horaInicio;
+      const ocupado = data.citasOcupadas.some(c => 
+        c.fecha === fecha && c.hora === horaInicio
+      );
+
+      if (ocupado) {
+        html += `<td><div class="cal-slot cal-slot-occupied" 
+                  data-fecha="${fecha}" 
+                  data-hora="${horaInicio}" 
+                  title="No disponible">✗</div></td>`;
+      } else {
+        html += `<td><div class="cal-slot cal-slot-available" 
+                  data-fecha="${fecha}" 
+                  data-hora="${horaInicio}" 
+                  onclick="calAbrirModal('${fecha}', '${horaInicio}', '${horario.texto}')" 
+                  title="Disponible - Click para reservar"></div></td>`;
+      }
+    });
+    
+    html += '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+  document.getElementById('calContenido').innerHTML = html;
+}
+
+// ============================================
+// GENERAR HORARIOS
+// ============================================
+function calGenerarHorarios(turno) {
+  const horarios = [];
+  let horaInicio, horaFin;
+
+  if (turno === 'Mañana') {
+    horaInicio = 8;
+    horaFin = 14;
+  } else {
+    horaInicio = 14;
+    horaFin = 20;
+  }
+
+  for (let h = horaInicio; h < horaFin; h++) {
+    for (let m = 0; m < 60; m += 20) {
+      const hActual = h.toString().padStart(2, '0');
+      const mActual = m.toString().padStart(2, '0');
+      const mSiguiente = ((m + 20) % 60).toString().padStart(2, '0');
+      const hSiguiente = (m === 40 ? h + 1 : h).toString().padStart(2, '0');
+
+      horarios.push({
+        horaInicio: `${hActual}:${mActual}`,
+        texto: `${hActual}:${mActual} - ${hSiguiente}:${mSiguiente}`
+      });
+    }
+  }
+
+  return horarios;
+}
+
+// ============================================
+// ABRIR MODAL
+// ============================================
+function calAbrirModal(fecha, hora, horarioTexto) {
+  console.log('📋 Abriendo modal de cita');
+
+  if (!calIdPaciente || calIdPaciente === 'null') {
+    if (typeof showAlert !== 'undefined') {
+      showAlert('No se ha seleccionado un paciente', 'error');
+    } else {
+      alert('No se ha seleccionado un paciente');
+    }
+    return;
+  }
+
+  calDatosModal = { fecha, hora, horarioTexto };
+
+  const url = `/Cita/ObtenerDatosModalCita?idMedico=${calIdMedico}&idPaciente=${calIdPaciente}`;
+  
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        if (typeof showAlert !== 'undefined') {
+          showAlert(data.mensaje, 'error');
+        } else {
+          alert(data.mensaje);
+        }
+        return;
+      }
+
+      // Llenar datos del modal
+      document.getElementById('calModalMedico').textContent = data.medicoNombre;
+      document.getElementById('calModalConsultorio').textContent = data.consultorio;
+      document.getElementById('calModalFecha').textContent = calFormatearFecha(fecha);
+      document.getElementById('calModalHora').textContent = hora;
+
+      document.getElementById('calModalPacienteDni').textContent = data.paciente.dni;
+      document.getElementById('calModalPacienteHC').textContent = data.paciente.historiaClinica;
+      document.getElementById('calModalPacienteNombre').textContent = data.paciente.nombreCompleto;
+      document.getElementById('calModalPacienteEdad').textContent = data.paciente.edad + ' años';
+      document.getElementById('calModalPacienteTelefono').textContent = data.paciente.telefono;
+      document.getElementById('calModalPacienteCorreo').textContent = data.paciente.correo;
+
+      // Cambiar título del modal si es reprogramación
+      const modalTitle = document.querySelector('.cal-modal-title');
+      if (calIdCita && calIdCita !== 'null') {
+        modalTitle.textContent = '📝 Reprogramar Cita Médica';
+      } else {
+        modalTitle.textContent = '📋 Reserva de Cita Médica';
+      }
+
+      // Cambiar texto del botón confirmar
+      const btnConfirm = document.querySelector('.cal-btn-confirm');
+      if (calIdCita && calIdCita !== 'null') {
+        btnConfirm.textContent = 'Reprogramar Cita';
+      } else {
+        btnConfirm.textContent = 'Confirmar Cita';
+      }
+
+      // Mostrar modal
+      document.getElementById('calModal').classList.add('show');
+    })
+    .catch(error => {
+      console.error('❌ Error:', error);
+      if (typeof showAlert !== 'undefined') {
+        showAlert('Error al cargar datos del modal', 'error');
+      } else {
+        alert('Error al cargar datos del modal');
+      }
+    });
+}
+
+// ============================================
+// CERRAR MODAL
+// ============================================
+function calCerrarModal() {
+  document.getElementById('calModal').classList.remove('show');
+}
+
+// ============================================
+// CONFIRMAR CITA (REGISTRAR O REPROGRAMAR)
+// ============================================
+// ============================================
+// CONFIRMAR CITA (REGISTRAR O REPROGRAMAR)
+// ============================================
+function calConfirmarCita() {
+  const esReprogramacion = calIdCita && calIdCita !== 'null';
+  
+  console.log(esReprogramacion ? '🔄 Reprogramando cita...' : '✅ Confirmando cita...');
+
+  const citaData = {
+    idMedico: calIdMedico,
+    idPaciente: calIdPaciente,
+    fechaCita: calDatosModal.fecha,
+    horaCita: calDatosModal.hora,
+    semana: calSemanaActual
+  };
+
+  if (esReprogramacion) {
+    citaData.idCita = calIdCita;
+  }
+
+  const endpoint = esReprogramacion ? '/ReprogramarCita' : '/Cita/RegistrarCita';
+  const metodo = esReprogramacion ? 'PUT' : 'POST';
+
+  console.log(`→ Endpoint: ${endpoint}`);
+  console.log('→ Datos:', citaData);
+
+  // Deshabilitar botón de confirmar para evitar doble click
+  const btnConfirmar = document.querySelector('.cal-btn-confirm');
+  const textoOriginal = btnConfirmar.textContent;
+  btnConfirmar.disabled = true;
+  btnConfirmar.textContent = 'Procesando...';
+  btnConfirmar.style.opacity = '0.6';
+  btnConfirmar.style.cursor = 'not-allowed';
+
+  fetch(endpoint, {
+    method: metodo,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(citaData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      const mensaje = esReprogramacion 
+        ? 'Cita reprogramada exitosamente' 
+        : 'Cita registrada exitosamente';
+      
+      showToast(mensaje, 'success');
+      
+      calCerrarModal();
+      
+      if (esReprogramacion && data.data) {
+        console.log('📅 Actualizando calendario visualmente...');
+        console.log('   → Datos recibidos:', data.data);
+        console.log('   → Horario anterior:', data.data.fechaAnterior, data.data.horaAnterior);
+        console.log('   → Horario nuevo:', data.data.fechaCita, data.data.horaCita);
+        console.log('   → Cambió médico:', data.data.cambioMedico);
+        
+        // Si NO cambió de médico, actualizar visualmente
+        if (!data.data.cambioMedico) {
+          setTimeout(() => {
+            console.log('🔄 Iniciando actualización visual...');
+            
+            // DESBLOQUEAR horario anterior
+            const anteriorDesbloqueado = calActualizarSlotVisual(
+              data.data.fechaAnterior, 
+              data.data.horaAnterior, 
+              false
+            );
+            
+            // BLOQUEAR nuevo horario
+            const nuevoBloqueado = calActualizarSlotVisual(
+              data.data.fechaCita, 
+              data.data.horaCita, 
+              true
+            );
+            
+            if (anteriorDesbloqueado && nuevoBloqueado) {
+              console.log('✅ Calendario actualizado visualmente');
+            } else {
+              console.warn('⚠️ No se pudieron actualizar algunos slots, recargando...');
+              calCargarCalendario();
+            }
+          }, 100);
+        } else {
+          console.log('⚠️ Cambió de médico, recargando calendario completo...');
+          calCargarCalendario();
+        }
+        
+        // Redirigir después de 2 segundos
+        setTimeout(() => {
+          window.location.href = '/Home/Paciente';
+        }, 2000);
+      } 
+    } else {
+      // Mostrar error en toast sin redireccionar
+      showToast(data.mensaje || 'Error al procesar la cita', 'error');
+      
+      // Rehabilitar botón
+      btnConfirmar.disabled = false;
+      btnConfirmar.textContent = textoOriginal;
+      btnConfirmar.style.opacity = '1';
+      btnConfirmar.style.cursor = 'pointer';
+    }
+  })
+  .catch(error => {
+    console.error('❌ Error de red o servidor:', error);
+    
+    // Mostrar error en toast sin redireccionar
+    showToast('Error de conexión. Por favor, intente nuevamente.', 'error');
+    
+    // Rehabilitar botón
+    btnConfirmar.disabled = false;
+    btnConfirmar.textContent = textoOriginal;
+    btnConfirmar.style.opacity = '1';
+    btnConfirmar.style.cursor = 'pointer';
+  });
+}
+// ============================================
+// ACTUALIZAR SLOT VISUAL (NUEVO)
+// ============================================
+function calActualizarSlotVisual(fecha, hora, ocupado) {
+  try {
+    console.log(`🎨 Actualizando slot: ${fecha} ${hora} - ${ocupado ? 'BLOQUEAR' : 'DESBLOQUEAR'}`);
+    
+    // Normalizar la hora para asegurar formato consistente
+    const horaNormalizada = hora.length === 4 ? `0${hora}` : hora;
+    
+    console.log(`   → Hora normalizada: ${horaNormalizada}`);
+    
+    // Buscar el slot específico usando data attributes
+    const slots = document.querySelectorAll('.cal-slot');
+    
+    let slotEncontrado = false;
+    
+    slots.forEach(slot => {
+      const slotFecha = slot.getAttribute('data-fecha');
+      const slotHora = slot.getAttribute('data-hora');
+      
+      // Debug: mostrar comparaciones
+      if (slotFecha === fecha) {
+        console.log(`   → Comparando: "${slotHora}" === "${horaNormalizada}"`);
+      }
+      
+      if (slotFecha === fecha && slotHora === horaNormalizada) {
+        console.log(`   ✓ Slot encontrado en DOM: ${fecha} ${horaNormalizada}`);
+        slotEncontrado = true;
+        
+        if (ocupado) {
+          // BLOQUEAR: Cambiar a ocupado (rojo)
+          slot.className = 'cal-slot cal-slot-occupied';
+          slot.innerHTML = '✗';
+          slot.title = 'No disponible';
+          slot.style.cursor = 'not-allowed';
+          slot.removeAttribute('onclick');
+          
+          // Animación de bloqueo
+          slot.style.transition = 'all 0.3s ease';
+          slot.style.transform = 'scale(0.95)';
+          setTimeout(() => {
+            slot.style.transform = 'scale(1)';
+          }, 300);
+          
+          console.log('   ✓ Slot BLOQUEADO (rojo) ✗');
+        } else {
+          // DESBLOQUEAR: Cambiar a disponible (blanco)
+          slot.className = 'cal-slot cal-slot-available';
+          slot.innerHTML = '';
+          slot.title = 'Disponible - Click para reservar';
+          slot.style.cursor = 'pointer';
+          
+          // Restaurar onclick
+          const horarioTexto = calGenerarTextoHorario(horaNormalizada);
+          slot.setAttribute('onclick', `calAbrirModal('${fecha}', '${horaNormalizada}', '${horarioTexto}')`);
+          
+          // Animación de desbloqueo
+          slot.style.transition = 'all 0.3s ease';
+          slot.style.transform = 'scale(1.08)';
+          slot.style.boxShadow = '0 0 12px rgba(52, 152, 219, 0.5)';
+          setTimeout(() => {
+            slot.style.transform = 'scale(1)';
+            slot.style.boxShadow = '';
+          }, 300);
+          
+          console.log('   ✓ Slot DESBLOQUEADO (blanco) ✓');
+        }
+      }
+    });
+    
+    if (!slotEncontrado) {
+      console.warn(`⚠️ No se encontró el slot en el DOM: ${fecha} ${horaNormalizada}`);
+      console.warn(`   → Posibles razones:`);
+      console.warn(`      1. El slot no está en la semana actual visible`);
+      console.warn(`      2. Error en el formato de hora`);
+      console.warn(`      3. El calendario necesita recargarse`);
+    }
+    
+    return slotEncontrado;
+  } catch (error) {
+    console.error('❌ Error al actualizar slot visual:', error);
+    return false;
+  }
+}
+
+// ============================================
+// GENERAR TEXTO HORARIO (AUXILIAR)
+// ============================================
+function calGenerarTextoHorario(hora) {
+  const [h, m] = hora.split(':').map(Number);
+  const minutosSiguiente = (m + 20) % 60;
+  const horaSiguiente = m === 40 ? h + 1 : h;
+  
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} - ${horaSiguiente.toString().padStart(2, '0')}:${minutosSiguiente.toString().padStart(2, '0')}`;
+}
+// ============================================
+// UTILIDADES
+// ============================================
+function calFormatearFecha(fecha) {
+  const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+                 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  const [year, month, day] = fecha.split('-');
+  const dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+  const date = new Date(year, month - 1, day);
+  return `${dias[date.getDay()]}, ${parseInt(day)} de ${meses[parseInt(month) - 1]} de ${year}`;
+}
+
+function calFormatearFechaCorta(fecha) {
+  const [year, month, day] = fecha.split('-');
+  return `${day}/${month}`;
+}
+function showToast(mensaje, tipo = 'info') {
+  console.log(`📢 Mostrando toast: [${tipo}] ${mensaje}`);
+  
+  const container = document.getElementById('toastContainer');
+  
+  // Crear el toast
+  const toast = document.createElement('div');
+  toast.className = `toast-alert toast-${tipo}`;
+  
+  // Icono según tipo
+  let icono = '🔔';
+  if (tipo === 'error') icono = '<i class="fas fa-exclamation-circle"></i>';
+  if (tipo === 'success') icono = '<i class="fas fa-check-circle"></i>';
+  if (tipo === 'info') icono = '<i class="fas fa-info-circle"></i>';
+  
+  toast.innerHTML = `
+    ${icono}
+    <span>${mensaje}</span>
+    <button type="button" class="close-toast" onclick="this.parentElement.remove()">&times;</button>
+  `;
+  
+  container.appendChild(toast);
+  
+  // Mostrar con animación
+  setTimeout(() => {
+    toast.style.transform = 'translateX(0)';
+    toast.style.opacity = '1';
+  }, 10);
+  
+  // Auto-cerrar después de 4 segundos
+  setTimeout(() => {
+    toast.style.transform = 'translateX(400px)';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// Alias para compatibilidad
+function showAlert(mensaje, tipo) {
+  showToast(mensaje, tipo);
+}
+</script>

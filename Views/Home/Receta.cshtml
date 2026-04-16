@@ -1,0 +1,127 @@
+@{
+    ViewData["Title"] = "Generar Receta Médica";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/receta-medica.css" asp-append-version="true" />
+}
+
+<div class="receta-container">
+    <div class="receta-header">
+        <h1 class="receta-title">Generar Receta Médica</h1>
+        <div class="hospital-info">
+            <div class="hospital-name-receta">Hospital Nacional Hipólito Unanue</div>
+            <div class="system-name-receta">SIGMEG - Sistema de Gestión Médica General</div>
+        </div>
+    </div>
+
+    <div class="receta-form-card">
+        <form id="recetaForm">
+            <!-- Datos del Medicamento -->
+            <div class="form-section">
+                <h2 class="section-title-receta">Datos del Medicamento</h2>
+
+                <div class="form-row">
+                    <div class="form-group-receta">
+                        <label for="productoFarmaceutico">Producto Farmacéutico *</label>
+                        <input type="text" id="productoFarmaceutico" class="form-input-receta" placeholder="Ej. Amoxicilina..." />
+                        <span class="error-text" id="errorProducto"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group-receta">
+                        <label for="concentracion">Concentración *</label>
+                        <input type="text" id="concentracion" class="form-input-receta" placeholder="Ej. 500 mg" />
+                        <span class="error-text" id="errorConcentracion"></span>
+                    </div>
+
+                    <div class="form-group-receta">
+                        <label for="frecuencia">Frecuencia *</label>
+                        <input type="text" id="frecuencia" class="form-input-receta" placeholder="Ej. Cada 8 horas" />
+                        <span class="error-text" id="errorFrecuencia"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group-receta">
+                        <label for="duracion">Duración *</label>
+                        <input type="text" id="duracion" class="form-input-receta" placeholder="Ej. 7 días" />
+                        <span class="error-text" id="errorDuracion"></span>
+                    </div>
+
+                    <div class="form-group-receta">
+                        <label for="viaAdministracion">Vía de Administración *</label>
+                        <select id="viaAdministracion" class="form-input-receta">
+                            <option value="">Seleccione</option>
+                            <option value="Oral">Oral</option>
+                            <option value="Intravenosa">Intravenosa</option>
+                            <option value="Intramuscular">Intramuscular</option>
+                            <option value="Subcutánea">Subcutánea</option>
+                            <option value="Tópica">Tópica</option>
+                            <option value="Oftálmica">Oftálmica</option>
+                            <option value="Nasal">Nasal</option>
+                            <option value="Rectal">Rectal</option>
+                        </select>
+                        <span class="error-text" id="errorVia"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group-receta full-width">
+                        <label for="observaciones">Observaciones</label>
+                        <textarea id="observaciones" class="form-textarea-receta" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" id="btnAgregarMedicamento" class="btn-receta btn-add-receta">
+                        <i class="fas fa-plus"></i> Agregar Medicamento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabla de medicamentos -->
+            <div class="form-section">
+                <h2 class="section-title-receta">Medicamentos Prescritos</h2>
+                <table class="table-receta">
+                    <thead>
+                        <tr>
+                            <th>#</th><th>Producto</th><th>Concentración</th><th>Frecuencia</th>
+                            <th>Duración</th><th>Vía</th><th>Obs.</th><th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medicamentosBody">
+                        <tr><td colspan="8" class="text-center-receta">No hay medicamentos agregados</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Observaciones Generales -->
+            <div class="form-section"> <h2 class="section-title-receta">Observaciones Generales</h2> <div class="form-row"> <div class="form-group-receta full-width"> <textarea id="observacionesGenerales" class="form-textarea-receta" rows="4" placeholder="Observaciones generales de la receta, recomendaciones adicionales..."></textarea> </div> </div> </div>
+
+            <!-- Datos ocultos -->
+            <input type="hidden" id="idCita" value="1" />
+            <input type="hidden" id="idMedico" value="1" />
+            <input type="hidden" id="idPaciente" value="1" />
+            <input type="hidden" id="idHistoriaClinica" value="1" />
+
+            <!-- Botones -->
+            <div class="actions-footer">
+                <button type="button" id="btnVolver" class="btn-receta btn-secondary-receta">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <button type="button" id="btnGuardarBasico" class="btn-receta btn-save-receta">
+                    <i class="fas fa-save"></i> Guardar Receta
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="alertContainerReceta"></div>
+
+@section Scripts {
+    <script src="~/js/receta-medica.js" asp-append-version="true"></script>
+}

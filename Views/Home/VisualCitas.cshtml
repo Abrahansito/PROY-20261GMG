@@ -1,0 +1,116 @@
+@{
+    ViewData["Title"] = "Visualizar disponibilidad de citas";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+<div class="page-container">
+  <div class="filters-section">
+    <h3 class="section-title">Disponibilidad de citas</h3>
+    <form id="visualCitasForm" onsubmit="return false;">
+      <div class="filters-grid">
+        <div class="form-group">
+          <label>Semana</label>
+          <select id="fSemana" class="form-control">
+            <option value="0">Semana actual</option>
+            <option value="1">En 1 semana</option>
+            <option value="2">En 2 semanas</option>
+            <option value="3">En 3 semanas</option>
+            <option value="4">En 4 semanas</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Número de DNI</label>
+          <input type="text" id="fNumeroDni" class="form-control" placeholder="Numero de DNI" />
+        </div>
+        
+        <div class="form-group">
+          <label>Consultorio</label>
+          <select id="fConsultorio" class="form-control">
+            <option value="">Todos los consultorios</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Estado</label>
+          <select id="fEstado" class="form-control">
+            <option value="">Todos</option>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Turno</label>
+          <select id="fTurno" class="form-control">
+            <option value="">Todos los turnos</option>
+            <option value="Mañana">Mañana</option>
+            <option value="Tarde">Tarde</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="filters-actions" style="margin-top:10px;">
+        <button id="buscarMedicosBtn" class="btn btn-primary">Buscar</button>
+        <button id="limpiarFiltrosBtn" class="btn btn-secondary" type="button">Limpiar Filtros</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-section" style="margin-top:20px;">
+    <h3 class="section-title">Resultados</h3>
+    <div class="table-responsive">
+      <table class="data-table" id="medicosTable">
+        <thead>
+          <tr>
+            <th>DNI</th>
+            <th>NOMBRE COMPLETO</th>
+            <th>TURNO</th>
+            <th>CONSULTORIO</th>
+            <th>CITAS ACTUALES</th>
+            <th>CITAS RESTANTES</th>
+            <th>ACCIÓN</th>
+          </tr>
+        </thead>
+        <tbody id="medicosTableBody">
+          <tr><td colspan="7" class="no-data">Use los filtros y haga clic en Buscar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para notificaciones -->
+<div id="notificationModal" class="custom-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">
+        <i class="fas fa-info-circle"></i>
+        Notificación
+      </h5>
+      <button type="button" class="close-btn" onclick="closeNotificationModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p id="notificationMessage"></p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" onclick="closeNotificationModal()">
+        Aceptar
+      </button>
+    </div>
+  </div>
+</div>
+
+@* Pasar los IDs desde el ViewBag al JavaScript *@
+<script>
+    window.APP_DATA = {
+        idPaciente: @Html.Raw(ViewBag.IdPaciente != null ? ViewBag.IdPaciente.ToString() : "null"),
+        idCita: @Html.Raw(ViewBag.IdCita != null ? ViewBag.IdCita.ToString() : "null")
+    };
+</script>
+
+@section Scripts {
+    <script src="~/js/visualCitas.js" asp-append-version="true"></script>
+}

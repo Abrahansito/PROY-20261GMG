@@ -1,0 +1,8 @@
+bin/
+obj/
+out/
+Debug/
+Release/
+*.tmp
+*.db-shm
+*.db-wal

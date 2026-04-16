@@ -1,0 +1,140 @@
+@model SGMG.Dtos.Response.PagoResponseDTO
+@{
+    ViewData["Title"] = "Resumen de Pago";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+
+<div class="container mt-4 resumen-page">
+    <center><h2> <b style="color: rgb(134, 134, 185)">Resumen de Pago</b> </h2></center>
+    
+    <div class="card mb-3">
+        <div class="card-header text-white" style="background-color: rgb(134, 134, 185)"> <b>👤 Información del Paciente</b> </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="small text-muted">DNI</div>
+                    <div class="fw-bold">@(string.IsNullOrWhiteSpace(Model.TipoDoc) ? "-" : Model.TipoDoc + " - " + Model.NumeroDoc)</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="small text-muted">HISTORIA CLÍNICA</div>
+                    <div class="fw-bold">@(string.IsNullOrWhiteSpace(Model.HistoriaClinicaCodigo) ? "-" : Model.HistoriaClinicaCodigo)</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="small text-muted">PACIENTE</div>
+                    <div class="fw-bold">@(string.IsNullOrWhiteSpace(Model.Nombres) ? "-" : Model.Nombres)</div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <div class="small text-muted">EDAD</div>
+                    <div>@(Model.Edad > 0 ? Model.Edad.ToString() + " años" : "-")</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="small text-muted">TIPO DE SEGURO</div>
+                    <div>@(string.IsNullOrWhiteSpace(Model.TipoSeguro) ? "-" : Model.TipoSeguro)</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="small text-muted">FECHA REGISTRO</div>
+                    <div>@(string.IsNullOrWhiteSpace(Model.FechaPago) ? "-" : Model.FechaPago)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header text-white" style="background-color: rgb(134, 134, 185)"> <b>🗓️ Información de la Cita</b></div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="small text-muted">FECHA DE CITA</div>
+                    <div class="fw-bold">@(string.IsNullOrWhiteSpace(Model.FechaCita) ? "-" : Model.FechaCita)</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="small text-muted">HORA</div>
+                    <div>@(string.IsNullOrWhiteSpace(Model.HoraCita) ? "-" : Model.HoraCita)</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="small text-muted">MÉDICO</div>
+                    <div>@(string.IsNullOrWhiteSpace(Model.Medico) ? "-" : Model.Medico)</div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="small text-muted">ESPECIALIDAD</div>
+                    <div>@(string.IsNullOrWhiteSpace(Model.Especialidad) ? "-" : Model.Especialidad)</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="small text-muted">CONSULTORIO</div>
+                    <div>@(string.IsNullOrWhiteSpace(Model.Consultorio) ? "-" : Model.Consultorio)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header" style="background-color: rgb(134, 134, 185)"> <b>🏅 Detalle de Servicios</b></div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Servicios == null || !Model.Servicios.Any())
+                    {
+                        <tr><td colspan="5" class="text-center">Sin detalle</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var s in Model.Servicios)
+                        {
+                            <tr>
+                                <td>@s.Codigo</td>
+                                <td>@s.Descripcion</td>
+                                <td>@s.Cantidad</td>
+                                <td>S/ @s.PrecioUnitario.ToString("F2")</td>
+                                <td>S/ @s.Total.ToString("F2")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div class="row mt-3">
+                <div class="col-md-8"></div>
+                <div class="col-md-4">
+                    <div class="d-flex justify-content-between"><span>Subtotal:</span><span>S/ @Model.Subtotal.ToString("F2")</span></div>
+                    <div class="d-flex justify-content-between"><span>IGV (0.18% - Servicios de Salud):</span><span>S/ @Model.Igv.ToString("F2")</span></div>
+                    <hr />
+                    <div class="d-flex justify-content-between fw-bold"><span>TOTAL A PAGAR:</span><span>S/ @Model.Total.ToString("F2")</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-5">
+        <div>
+            <a href="/pagos/all" class="btn btn-secondary">← Volver</a>
+        </div>
+        <div>
+            <button class="btn btn-outline-primary" onclick="window.print()"> 🖨️ Imprimir</button>
+            @if (Model.Estado == "Pendiente")
+            {
+                <form method="post" action="/pagos/pagar/@Model.Id" style="display:inline-block">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-success ms-2" > 💵 Pagar</button>
+                </form>
+            }
+            else
+            {
+                <a href="#" class="btn btn-info ms-2">Ver detalle</a>
+            }
+        </div>
+    </div>
+</div>

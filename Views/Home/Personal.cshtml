@@ -1,0 +1,770 @@
+@{
+    ViewData["Title"] = "Gestión de Personal";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/cssPersonNuevo.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/cssPersonalModales.css" asp-append-version="true" />
+}
+
+<div class="page-container">
+    <!-- Alert Messages -->
+    <div id="alertContainer"></div>
+
+    <!-- Summary Cards -->
+    <div class="summary-section">
+        <h2 class="section-title">Resumen del Personal</h2>
+        <div class="summary-cards" id="summaryCards">
+            <!-- Cards will be loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Search Filters -->
+    <div class="personal-filters-wrapper">
+        <h3 class="section-title">Filtros de Búsqueda</h3>
+        <form id="searchForm">
+            <div class="personal-filters-grid">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="Nombre" class="form-control" placeholder="Buscar por nombre">
+                    <span class="error-message" id="error-Nombre"></span>
+                </div>
+                <div class="form-group">
+                    <label for="dni">DNI:</label>
+                    <input type="text" id="dni" name="Dni" class="form-control" placeholder="Buscar por DNI" maxlength="8">
+                    <span class="error-message" id="error-Dni"></span>
+                </div>
+                <div class="form-group">
+                    <label for="estado">Estado:</label>
+                    <select id="estado" name="Estado" class="form-control">
+                        <option value="">Todos</option>
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                    <span class="error-message" id="error-Estado"></span>
+                </div>
+                <div class="form-group">
+                    <label for="tipoPersonal">Tipo de personal:</label>
+                    <select id="tipoPersonal" name="TipoPersonal" class="form-control">
+                        <option value="">Todas las categorías</option>
+                    </select>
+                    <span class="error-message" id="error-TipoPersonal"></span>
+                </div>
+                <div class="form-group">
+                    <label for="consultorio">Consultorio:</label>
+                    <select id="consultorio" name="IdConsultorio" class="form-control">
+                        <option value="">Todos</option>
+                    </select>
+                    <span class="error-message" id="error-IdConsultorio"></span>
+                </div>
+            </div>
+            <div class="personal-filters-actions">
+                <button type="submit" class="personal-btn personal-btn-primary">Filtrar</button>
+                <button type="button" class="personal-btn personal-btn-secondary" id="clearBtn">Limpiar</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Add Buttons Section -->
+    <div class="personal-add-wrapper">
+        <div class="personal-add-buttons-container">
+            <button class="personal-btn personal-btn-success" id="addMedicoBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                Agregar Médico
+            </button>
+            <button class="personal-btn personal-btn-success" id="addEnfermeriaBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Agregar Enfermería
+            </button>
+            <button class="personal-btn personal-btn-success" id="addTecnicoBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+                Agregar Personal Técnico
+            </button>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-section">
+        <h3 class="section-title">Personal Registrado</h3>
+        <div class="table-responsive">
+            <table class="data-table" id="personalTable">
+                <thead>
+                    <tr>
+                        <th>DNI</th>
+                        <th>NOMBRES Y APELLIDOS</th>
+                        <th>CARGO</th>
+                        <th>ESTADO</th>
+                        <th>TELÉFONO</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="6" class="no-data">No se han aplicado filtros. Use los filtros para buscar personal.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Los modales se mantienen igual -->
+<!-- Modal para Ver Detalles -->
+<div id="viewModal" class="personal-modal">
+    <div class="personal-modal-content">
+        <div class="personal-modal-header">
+            <h2 id="viewModalTitle" class="personal-modal-title">Detalles del Personal</h2>
+            <button class="personal-modal-close" onclick="closeViewModal()">&times;</button>
+        </div>
+        <div class="personal-modal-body" id="viewModalBody">
+            <!-- Contenido dinámico -->
+        </div>
+        <div class="personal-modal-footer">
+            <button class="btn btn-secondary" onclick="closeViewModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar -->
+<div id="editModal" class="personal-modal">
+    <div class="personal-modal-content">
+        <div class="personal-modal-header">
+            <h2 id="editModalTitle" class="personal-modal-title">Editar Personal</h2>
+            <button class="personal-modal-close" onclick="closeEditModal()">&times;</button>
+        </div>
+        <div class="personal-modal-body">
+            <form id="editForm">
+                <input type="hidden" id="edit_id" name="id">
+                <input type="hidden" id="edit_cargo" name="cargo">
+                
+                <!-- Datos Personales -->
+                <div class="personal-form-section">
+                    <h3 class="personal-form-section-title">Datos Personales</h3>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="edit_dni">DNI / Documento de Identidad *</label>
+                            <input type="text" id="edit_dni" class="form-control" maxlength="8" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_nombre">Nombres y Apellidos *</label>
+                            <input type="text" id="edit_nombre" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="edit_fechaNacimiento">Fecha de Nacimiento *</label>
+                            <input type="date" id="edit_fechaNacimiento" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_sexo">Sexo *</label>
+                            <select id="edit_sexo" class="form-control" required>
+                                <option value="">Seleccione...</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="edit_direccion">Dirección *</label>
+                            <input type="text" id="edit_direccion" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="edit_telefono">Teléfono / Celular *</label>
+                            <input type="text" id="edit_telefono" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_email">Correo Electrónico *</label>
+                            <input type="email" id="edit_email" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos Laborales Generales -->
+                <div class="personal-form-section">
+                    <h3 class="personal-form-section-title">Datos Laborales Generales</h3>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="edit_estadoLaboral">Estado Laboral *</label>
+                            <select id="edit_estadoLaboral" class="form-control" required>
+                                <option value="">Seleccione...</option>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_fechaIngreso">Fecha de Ingreso *</label>
+                            <input type="date" id="edit_fechaIngreso" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="edit_turno">Turno / Horario *</label>
+                            <select id="edit_turno" class="form-control" required>
+                                <option value="">Seleccione...</option>
+                                <option value="Mañana">Mañana</option>
+                                <option value="Tarde">Tarde</option>
+                                <option value="Noche">Noche</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_areaServicio">Área / Servicio Hospitalario *</label>
+                            <input type="text" id="edit_areaServicio" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="edit_cargoDisplay">Cargo</label>
+                            <input type="text" id="edit_cargoDisplay" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información Especializada (Médico) -->
+                <div class="personal-form-section" id="medicoSection" style="display: none;">
+                    <h3 class="personal-form-section-title">Información de Médico</h3>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="edit_numeroColegiatura">Número de Colegiatura (CMP) *</label>
+                            <input type="text" id="edit_numeroColegiatura" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_tipoMedico">Tipo de Médico *</label>
+                            <select id="edit_tipoMedico" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="General">General</option>
+                                <option value="Residente">Residente</option>
+                                <option value="Especialista">Especialista</option>
+                                <option value="Interno">Interno</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="edit_consultorioMedico">Consultorio Asignado *</label>
+                            <select id="edit_consultorioMedico" class="form-control">
+                                <option value="">Seleccione...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información Especializada (Enfermería) -->
+                <div class="personal-form-section" id="enfermeriaSection" style="display: none;">
+                    <h3 class="personal-form-section-title">Información de Enfermería</h3>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="edit_numeroColegiaturaEnf">Número de Colegiatura *</label>
+                            <input type="text" id="edit_numeroColegiaturaEnf" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_nivelProfesional">Nivel Profesional *</label>
+                            <select id="edit_nivelProfesional" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="Técnico">Técnico</option>
+                                <option value="Licenciado">Licenciado</option>
+                                <option value="Especialista">Especialista</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="edit_consultorioEnf">Consultorio Asignado *</label>
+                            <select id="edit_consultorioEnf" class="form-control">
+                                <option value="">Seleccione...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="personal-modal-footer">
+            <button class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveEdit()">Guardar Cambios</button>
+        </div>
+    </div>
+</div>
+<!-- Modal para Registrar Médico -->
+<div id="addMedicoModal" class="personal-modal">
+    <div class="personal-modal-content">
+        <div class="personal-modal-header">
+            <h2 class="personal-modal-title">Registrar Nuevo Médico</h2>
+            <button class="personal-modal-close" onclick="closeAddMedicoModal()">&times;</button>
+        </div>
+        <div class="personal-modal-body">
+            <form id="addMedicoForm">
+                <!-- Datos Personales -->
+                <div class="personal-form-section">
+                    <h3 class="personal-form-section-title">Datos Personales</h3>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_medico_dni">DNI <span class="required">*</span></label>
+                            <input type="text" id="add_medico_dni" class="form-control" maxlength="8" placeholder="Ej: 12345678">
+                            <span class="error-message" id="error-add_medico_NumeroDni"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_medico_nombre">Nombre <span class="required">*</span></label>
+                            <input type="text" id="add_medico_nombre" class="form-control" placeholder="Ej: Juan">
+                            <span class="error-message" id="error-add_medico_Nombre"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_medico_apellidoPaterno">Apellido Paterno <span class="required">*</span></label>
+                            <input type="text" id="add_medico_apellidoPaterno" class="form-control" placeholder="Ej: Pérez">
+                            <span class="error-message" id="error-add_medico_ApellidoPaterno"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_medico_apellidoMaterno">Apellido Materno</label>
+                            <input type="text" id="add_medico_apellidoMaterno" class="form-control" placeholder="Ej: García">
+                            <span class="error-message" id="error-add_medico_ApellidoMaterno"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_medico_fechaNacimiento">Fecha de Nacimiento <span class="required">*</span></label>
+                            <input type="date" id="add_medico_fechaNacimiento" class="form-control">
+                            <span class="error-message" id="error-add_medico_FechaNacimiento"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_medico_sexo">Sexo <span class="required">*</span></label>
+                            <select id="add_medico_sexo" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                            <span class="error-message" id="error-add_medico_Sexo"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_medico_direccion">Dirección</label>
+                            <input type="text" id="add_medico_direccion" class="form-control" placeholder="Ej: Av. Principal 123">
+                            <span class="error-message" id="error-add_medico_Direccion"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_medico_telefono">Teléfono</label>
+                            <input type="text" id="add_medico_telefono" class="form-control" placeholder="Ej: 987654321">
+                            <span class="error-message" id="error-add_medico_Telefono"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_medico_email">Correo Electrónico <span class="required">*</span></label>
+                            <input type="email" id="add_medico_email" class="form-control" placeholder="Ej: medico@hospital.com">
+                            <span class="error-message" id="error-add_medico_CorreoElectronico"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos Laborales -->
+                <div class="personal-form-section">
+                    <h3 class="personal-form-section-title">Datos Laborales</h3>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_medico_estadoLaboral">Estado Laboral <span class="required">*</span></label>
+                            <select id="add_medico_estadoLaboral" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                                <option value="Licencia">Licencia</option>
+                                <option value="Vacaciones">Vacaciones</option>
+                            </select>
+                            <span class="error-message" id="error-add_medico_EstadoLaboral"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_medico_fechaIngreso">Fecha de Ingreso <span class="required">*</span></label>
+                            <input type="date" id="add_medico_fechaIngreso" class="form-control">
+                            <span class="error-message" id="error-add_medico_FechaIngreso"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_medico_turno">Turno <span class="required">*</span></label>
+                            <select id="add_medico_turno" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="Mañana">Mañana</option>
+                                <option value="Tarde">Tarde</option>
+                                <option value="Noche">Noche</option>
+                                <option value="Rotativo">Rotativo</option>
+                            </select>
+                            <span class="error-message" id="error-add_medico_Turno"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_medico_areaServicio">Área/Servicio <span class="required">*</span></label>
+                            <input type="text" id="add_medico_areaServicio" class="form-control" placeholder="Ej: Medicina General">
+                            <span class="error-message" id="error-add_medico_AreaServicio"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de Médico -->
+                <div class="personal-form-section">
+                    <h3 class="personal-form-section-title">Información de Médico</h3>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_medico_numeroColegiatura">Número de Colegiatura (CMP) <span class="required">*</span></label>
+                            <input type="text" id="add_medico_numeroColegiatura" class="form-control" placeholder="Ej: CMP-12345">
+                            <span class="error-message" id="error-add_medico_NumeroColegiatura"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_medico_tipoMedico">Tipo de Médico <span class="required">*</span></label>
+                            <select id="add_medico_tipoMedico" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="General">General</option>
+                                <option value="Especialista">Especialista</option>
+                                <option value="Residente">Residente</option>
+                                <option value="Interno">Interno</option>
+                            </select>
+                            <span class="error-message" id="error-add_medico_TipoMedico"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_medico_consultorio">Consultorio Asignado <span class="required">*</span></label>
+                            <select id="add_medico_consultorio" class="form-control">
+                                <option value="">Seleccione...</option>
+                            </select>
+                            <span class="error-message" id="error-add_medico_IdConsultorio"></span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="personal-modal-footer">
+            <button class="btn btn-secondary" onclick="closeAddMedicoModal()">Cancelar</button>
+            <button class="btn btn-success" onclick="saveAddMedico()">Registrar Médico</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Registrar Enfermería -->
+<div id="addEnfermeriaModal" class="personal-modal">
+    <div class="personal-modal-content">
+        <div class="personal-modal-header">
+            <h2 class="personal-modal-title">Registrar Nueva Enfermería</h2>
+            <button class="personal-modal-close" onclick="closeAddEnfermeriaModal()">&times;</button>
+        </div>
+        <div class="personal-modal-body">
+            <form id="addEnfermeriaForm">
+                <!-- Datos Personales -->
+                <div class="personal-form-section">
+                    <h3 class="personal-form-section-title">Datos Personales</h3>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_enf_dni">DNI <span class="required">*</span></label>
+                            <input type="text" id="add_enf_dni" class="form-control" maxlength="8" placeholder="Ej: 12345678">
+                            <span class="error-message" id="error-add_enf_NumeroDni"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_enf_nombre">Nombre <span class="required">*</span></label>
+                            <input type="text" id="add_enf_nombre" class="form-control" placeholder="Ej: María">
+                            <span class="error-message" id="error-add_enf_Nombre"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_enf_apellidoPaterno">Apellido Paterno <span class="required">*</span></label>
+                            <input type="text" id="add_enf_apellidoPaterno" class="form-control" placeholder="Ej: López">
+                            <span class="error-message" id="error-add_enf_ApellidoPaterno"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_enf_apellidoMaterno">Apellido Materno</label>
+                            <input type="text" id="add_enf_apellidoMaterno" class="form-control" placeholder="Ej: Torres">
+                            <span class="error-message" id="error-add_enf_ApellidoMaterno"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_enf_fechaNacimiento">Fecha de Nacimiento <span class="required">*</span></label>
+                            <input type="date" id="add_enf_fechaNacimiento" class="form-control">
+                            <span class="error-message" id="error-add_enf_FechaNacimiento"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_enf_sexo">Sexo <span class="required">*</span></label>
+                            <select id="add_enf_sexo" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                            <span class="error-message" id="error-add_enf_Sexo"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_enf_direccion">Dirección</label>
+                            <input type="text" id="add_enf_direccion" class="form-control" placeholder="Ej: Calle Lima 456">
+                            <span class="error-message" id="error-add_enf_Direccion"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_enf_telefono">Teléfono</label>
+                            <input type="text" id="add_enf_telefono" class="form-control" placeholder="Ej: 987654321">
+                            <span class="error-message" id="error-add_enf_Telefono"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_enf_email">Correo Electrónico <span class="required">*</span></label>
+                            <input type="email" id="add_enf_email" class="form-control" placeholder="Ej: enfermera@hospital.com">
+                            <span class="error-message" id="error-add_enf_Email"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos Laborales -->
+                <div class="personal-form-section">
+                    <h3 class="personal-form-section-title">Datos Laborales</h3>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_enf_estadoLaboral">Estado Laboral <span class="required">*</span></label>
+                            <select id="add_enf_estadoLaboral" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                                <option value="Licencia">Licencia</option>
+                                <option value="Vacaciones">Vacaciones</option>
+                                <option value="Suspendido">Suspendido</option>
+                            </select>
+                            <span class="error-message" id="error-add_enf_EstadoLaboral"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_enf_fechaIngreso">Fecha de Ingreso <span class="required">*</span></label>
+                            <input type="date" id="add_enf_fechaIngreso" class="form-control">
+                            <span class="error-message" id="error-add_enf_FechaIngreso"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_enf_turno">Turno <span class="required">*</span></label>
+                            <select id="add_enf_turno" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="Mañana">Mañana</option>
+                                <option value="Tarde">Tarde</option>
+                                <option value="Noche">Noche</option>
+                                <option value="Rotativo">Rotativo</option>
+                            </select>
+                            <span class="error-message" id="error-add_enf_Turno"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_enf_areaServicio">Área/Servicio <span class="required">*</span></label>
+                            <input type="text" id="add_enf_areaServicio" class="form-control" placeholder="Ej: Emergencia">
+                            <span class="error-message" id="error-add_enf_AreaServicio"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de Enfermería -->
+                <div class="personal-form-section">
+                    <h3 class="personal-form-section-title">Información de Enfermería</h3>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_enf_numeroColegiatura">Número de Colegiatura</label>
+                            <input type="text" id="add_enf_numeroColegiatura" class="form-control" placeholder="Ej: CEP-12345">
+                            <span class="error-message" id="error-add_enf_NumeroColegiaturaEnfermeria"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_enf_nivelProfesional">Nivel Profesional</label>
+                            <select id="add_enf_nivelProfesional" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="Técnico">Técnico</option>
+                                <option value="Licenciado">Licenciado</option>
+                                <option value="Especialista">Especialista</option>
+                            </select>
+                            <span class="error-message" id="error-add_enf_NivelProfesional"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_enf_consultorio">Consultorio Asignado <span class="required">*</span></label>
+                            <select id="add_enf_consultorio" class="form-control">
+                                <option value="">Seleccione...</option>
+                            </select>
+                            <span class="error-message" id="error-add_enf_IdConsultorio"></span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="personal-modal-footer">
+            <button class="btn btn-secondary" onclick="closeAddEnfermeriaModal()">Cancelar</button>
+            <button class="btn btn-success" onclick="saveAddEnfermeria()">Registrar Enfermería</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Registrar Personal Técnico -->
+<div id="addTecnicoModal" class="personal-modal">
+    <div class="personal-modal-content">
+        <div class="personal-modal-header">
+            <h2 class="personal-modal-title">Registrar Personal Técnico</h2>
+            <button class="personal-modal-close" onclick="closeAddTecnicoModal()">&times;</button>
+        </div>
+        <div class="personal-modal-body">
+            <form id="addTecnicoForm">
+                <!-- Datos Personales -->
+                <div class="personal-form-section">
+                    <h3 class="personal-form-section-title">Datos Personales</h3>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_tec_dni">DNI <span class="required">*</span></label>
+                            <input type="text" id="add_tec_dni" class="form-control" maxlength="8" placeholder="Ej: 12345678">
+                            <span class="error-message" id="error-add_tec_NumeroDni"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_tec_nombre">Nombre <span class="required">*</span></label>
+                            <input type="text" id="add_tec_nombre" class="form-control" placeholder="Ej: Carlos">
+                            <span class="error-message" id="error-add_tec_Nombre"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_tec_apellidoPaterno">Apellido Paterno <span class="required">*</span></label>
+                            <input type="text" id="add_tec_apellidoPaterno" class="form-control" placeholder="Ej: Ramírez">
+                            <span class="error-message" id="error-add_tec_ApellidoPaterno"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_tec_apellidoMaterno">Apellido Materno</label>
+                            <input type="text" id="add_tec_apellidoMaterno" class="form-control" placeholder="Ej: Silva">
+                            <span class="error-message" id="error-add_tec_ApellidoMaterno"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_tec_fechaNacimiento">Fecha de Nacimiento <span class="required">*</span></label>
+                            <input type="date" id="add_tec_fechaNacimiento" class="form-control">
+                            <span class="error-message" id="error-add_tec_FechaNacimiento"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_tec_sexo">Sexo <span class="required">*</span></label>
+                            <select id="add_tec_sexo" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                            <span class="error-message" id="error-add_tec_Sexo"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_tec_direccion">Dirección</label>
+                            <input type="text" id="add_tec_direccion" class="form-control" placeholder="Ej: Jr. Cusco 789">
+                            <span class="error-message" id="error-add_tec_Direccion"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_tec_telefono">Teléfono</label>
+                            <input type="text" id="add_tec_telefono" class="form-control" placeholder="Ej: 987654321">
+                            <span class="error-message" id="error-add_tec_Telefono"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_tec_email">Correo Electrónico <span class="required">*</span></label>
+                            <input type="email" id="add_tec_email" class="form-control" placeholder="Ej: tecnico@hospital.com">
+                            <span class="error-message" id="error-add_tec_Email"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos Laborales -->
+                <div class="personal-form-section">
+                    <h3 class="personal-form-section-title">Datos Laborales</h3>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_tec_estadoLaboral">Estado Laboral <span class="required">*</span></label>
+                            <select id="add_tec_estadoLaboral" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                                <option value="Licencia">Licencia</option>
+                                <option value="Vacaciones">Vacaciones</option>
+                                <option value="Suspendido">Suspendido</option>
+                            </select>
+                            <span class="error-message" id="error-add_tec_EstadoLaboral"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_tec_fechaIngreso">Fecha de Ingreso <span class="required">*</span></label>
+                            <input type="date" id="add_tec_fechaIngreso" class="form-control">
+                            <span class="error-message" id="error-add_tec_FechaIngreso"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_tec_turno">Turno <span class="required">*</span></label>
+                            <select id="add_tec_turno" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="Mañana">Mañana</option>
+                                <option value="Tarde">Tarde</option>
+                               
+                                
+                            </select>
+                            <span class="error-message" id="error-add_tec_Turno"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_tec_areaServicio">Área/Servicio <span class="required">*</span></label>
+                            <input type="text" id="add_tec_areaServicio" class="form-control" placeholder="Ej: Administración">
+                            <span class="error-message" id="error-add_tec_AreaServicio"></span>
+                        </div>
+                    </div>
+                    <div class="personal-form-row">
+                        <div class="form-group">
+                            <label for="add_tec_cargo">Cargo <span class="required">*</span></label>
+                            <select id="add_tec_cargo" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option value="CAJERO">Cajero</option>
+                                <option value="ADMINISTRADOR">Administrador</option>
+                                <option value="ADMISION">Admision</option>
+                            </select>
+                            <span class="error-message" id="error-add_tec_Cargo"></span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="personal-modal-footer">
+            <button class="btn btn-secondary" onclick="closeAddTecnicoModal()">Cancelar</button>
+            <button class="btn btn-success" onclick="saveAddTecnico()">Registrar Personal</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Eliminar -->
+<div id="deleteModal" class="personal-modal">
+    <div class="personal-modal-content personal-delete-modal">
+        <div class="personal-modal-header">
+            <h2 class="personal-modal-title">Confirmar Eliminación</h2>
+            <button class="personal-modal-close" onclick="closeDeleteModal()">&times;</button>
+        </div>
+        <div class="personal-modal-body">
+            <p>¿Está seguro que desea eliminar el siguiente registro?</p>
+            <div class="personal-delete-info">
+                <p><strong>Nombre:</strong> <span id="delete_nombre"></span></p>
+                <p><strong>Cargo:</strong> <span id="delete_cargo"></span></p>
+                <p><strong>DNI:</strong> <span id="delete_dni"></span></p>
+            </div>
+            <input type="hidden" id="delete_id">
+            <input type="hidden" id="delete_tipoPersonal">
+        </div>
+        <div class="personal-modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
+            <button type="button" class="btn btn-danger" onclick="confirmDelete()">Eliminar</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/scriptPersonal.js" asp-append-version="true"></script>
+  
+}

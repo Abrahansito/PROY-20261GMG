@@ -1,0 +1,359 @@
+@{
+    ViewData["Title"] = "Historial de Derivaciones";
+    var paciente = ViewBag.Paciente as SGMG.Models.Paciente;
+    var historial = ViewBag.HistorialDerivaciones as IEnumerable<dynamic>;
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+@section Styles {
+<style>
+    .derivacion-patient-info {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border: 1px solid #dee2e6;
+    }
+    .derivacion-info-item {
+        display: inline-block;
+        margin-right: 30px;
+        margin-bottom: 10px;
+    }
+    .derivacion-info-label {
+        font-weight: bold;
+        color: #666;
+        font-size: 11px;
+        text-transform: uppercase;
+    }
+    .derivacion-info-value {
+        color: #333;
+        font-size: 14px;
+    }
+    .derivacion-table-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .derivacion-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .derivacion-table thead {
+        background-color: #f8f9fa;
+    }
+    .derivacion-table th {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        color: #495057;
+        font-size: 13px;
+    }
+    .derivacion-table td {
+        padding: 12px;
+        border-bottom: 1px solid #dee2e6;
+        font-size: 13px;
+        color: #333;
+    }
+    .derivacion-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    .derivacion-btn-detalle {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: background-color 0.3s;
+    }
+    .derivacion-btn-detalle:hover {
+        background-color: #0056b3;
+    }
+    .derivacion-btn-ocultar {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: background-color 0.3s;
+    }
+    .derivacion-btn-ocultar:hover {
+        background-color: #545b62;
+    }
+    .derivacion-detalle-box {
+        background-color: #e3f2fd;
+        padding: 20px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border-left: 4px solid #2196F3;
+        display: none;
+    }
+    .derivacion-detalle-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1976D2;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #90CAF9;
+    }
+    .derivacion-detalle-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    .derivacion-detalle-item {
+        margin-bottom: 10px;
+    }
+    .derivacion-detalle-label {
+        font-weight: bold;
+        color: #333;
+        display: block;
+        margin-bottom: 5px;
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+    .derivacion-detalle-value {
+        color: #555;
+        font-size: 14px;
+    }
+    .derivacion-motivo-box {
+        grid-column: 1 / -1;
+        background-color: white;
+        padding: 15px;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+    .derivacion-header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .derivacion-page-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin: 0;
+    }
+    .derivacion-prioridad-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .derivacion-prioridad-normal {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .derivacion-prioridad-baja {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+  
+</style>
+}
+
+<div class="page-container">
+     <div class="derivacion-header-container">
+        <h1 class="derivacion-page-title">Historial de Derivaciones</h1>
+        <button class="btn btn-success" onclick="window.location.href='/Derivacion/Create/@ViewBag.IdCitaActual'">
+    <i class="fas fa-plus"></i> Nueva Derivación
+</button>
+    </div>
+
+    <!-- Información del Paciente -->
+    <div class="derivacion-patient-info">
+        <div class="derivacion-info-item">
+            <div class="derivacion-info-label">ID</div>
+            <div class="derivacion-info-value">@paciente?.IdPaciente</div>
+        </div>
+        <div class="derivacion-info-item">
+            <div class="derivacion-info-label">Nombre Completo</div>
+            <div class="derivacion-info-value">@paciente?.Nombre @paciente?.ApellidoPaterno @paciente?.ApellidoMaterno</div>
+        </div>
+        <div class="derivacion-info-item">
+            <div class="derivacion-info-label">Sexo</div>
+            <div class="derivacion-info-value">@paciente?.Sexo</div>
+        </div>
+        <div class="derivacion-info-item">
+            <div class="derivacion-info-label">Edad</div>
+            <div class="derivacion-info-value">@paciente?.Edad años</div>
+        </div>
+        <div class="derivacion-info-item">
+            <div class="derivacion-info-label">Seguro</div>
+            <div class="derivacion-info-value">SIS - Sistema Integral de Salud</div>
+        </div>
+    </div>
+
+    <!-- Tabla de Derivaciones -->
+    <div class="derivacion-table-container">
+        <table class="derivacion-table">
+            <thead>
+                <tr>
+                    <th>TIPO DOC</th>
+                    <th>NRO. DOCUMENTO</th>
+                    <th>MÉDICO SOLICITANTE</th>
+                    <th>ESPECIALIDAD SOLICITADA</th>
+                    <th>FECHA SOLICITUD</th>
+                    <th>ACCIONES</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (historial != null && historial.Any())
+                {
+                    @foreach (var derivacion in historial)
+                    {
+                        var idFormatted = $"DER{derivacion.IdDerivacion:000}";
+                        <tr>
+                            <td>@derivacion.TipoDocumento</td>
+                            <td>@derivacion.NumeroDocumento</td>
+                            <td>@derivacion.MedicoSolicitante</td>
+                            <td>@derivacion.EspecialidadDestino</td>
+                            <td>@derivacion.FechaDerivacion.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <button class="derivacion-btn-detalle" onclick="toggleDetalle(@derivacion.IdDerivacion)" id="btn-@derivacion.IdDerivacion">
+                                    Ocultar detalles
+                                </button>
+                            </td>
+                        </tr>
+                        <tr id="detalle-@derivacion.IdDerivacion" class="detalle-row" style="display: none;">
+                            <td colspan="6">
+                                <div class="derivacion-detalle-box" id="detalle-content-@derivacion.IdDerivacion">
+                                    <div class="derivacion-detalle-title">Detalles de la Derivación #@idFormatted</div>
+                                    <div class="derivacion-detalle-grid">
+                                        <div class="derivacion-detalle-item">
+                                            <span class="derivacion-detalle-label">Paciente</span>
+                                            <span class="derivacion-detalle-value" id="detalle-paciente-@derivacion.IdDerivacion"></span>
+                                        </div>
+                                        <div class="derivacion-detalle-item">
+                                            <span class="derivacion-detalle-label">Médico Solicitante</span>
+                                            <span class="derivacion-detalle-value" id="detalle-medico-@derivacion.IdDerivacion"></span>
+                                        </div>
+                                        <div class="derivacion-detalle-item">
+                                            <span class="derivacion-detalle-label">Tipo de Documento</span>
+                                            <span class="derivacion-detalle-value" id="detalle-tipo-doc-@derivacion.IdDerivacion"></span>
+                                        </div>
+                                        <div class="derivacion-detalle-item">
+                                            <span class="derivacion-detalle-label">Nro. Documento</span>
+                                            <span class="derivacion-detalle-value" id="detalle-nro-doc-@derivacion.IdDerivacion"></span>
+                                        </div>
+                                        <div class="derivacion-detalle-item">
+                                            <span class="derivacion-detalle-label">Especialidad Solicitada</span>
+                                            <span class="derivacion-detalle-value" id="detalle-especialidad-@derivacion.IdDerivacion"></span>
+                                        </div>
+                                        <div class="derivacion-detalle-item">
+                                            <span class="derivacion-detalle-label">Fecha Solicitud</span>
+                                            <span class="derivacion-detalle-value" id="detalle-fecha-@derivacion.IdDerivacion"></span>
+                                        </div>
+                                        <div class="derivacion-detalle-item">
+                                            <span class="derivacion-detalle-label">Seguro</span>
+                                            <span class="derivacion-detalle-value" id="detalle-seguro-@derivacion.IdDerivacion"></span>
+                                        </div>
+                                        <div class="derivacion-detalle-item">
+                                            <span class="derivacion-detalle-label">Servicio Origen</span>
+                                            <span class="derivacion-detalle-value" id="detalle-servicio-@derivacion.IdDerivacion"></span>
+                                        </div>
+                                        <div class="derivacion-detalle-item">
+                                            <span class="derivacion-detalle-label">Prioridad</span>
+                                            <span class="derivacion-detalle-value">
+                                                <span class="derivacion-prioridad-badge derivacion-prioridad-normal" id="detalle-prioridad-@derivacion.IdDerivacion"></span>
+                                            </span>
+                                        </div>
+                                        <div class="derivacion-detalle-item">
+                                            <span class="derivacion-detalle-label">ID Cita Origen</span>
+                                            <span class="derivacion-detalle-value" id="detalle-idcita-@derivacion.IdDerivacion"></span>
+                                        </div>
+                                        <div class="derivacion-motivo-box">
+                                            <span class="derivacion-detalle-label">Motivo de la Derivación</span>
+                                            <p class="derivacion-detalle-value" id="detalle-motivo-@derivacion.IdDerivacion"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="no-data">No se encontraron derivaciones para este paciente</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    
+    <p style="margin-top: 20px; color: #6c757d; font-size: 13px;">
+        Mostrando 1 a @(historial?.Count() ?? 0) de @(historial?.Count() ?? 0) registros
+    </p>
+</div>
+
+@section Scripts {
+<script>
+    let detallesCache = {};
+
+    async function toggleDetalle(idDerivacion) {
+        const detalleRow = document.getElementById(`detalle-${idDerivacion}`);
+        const detalleBox = document.getElementById(`detalle-content-${idDerivacion}`);
+        const btn = document.getElementById(`btn-${idDerivacion}`);
+        
+        if (detalleRow.style.display === 'none') {
+            // Mostrar detalles
+            if (!detallesCache[idDerivacion]) {
+                // Cargar datos si no están en caché
+                try {
+                    const response = await fetch(`/HistorialDerivacion/ObtenerDetalle?idDerivacion=${idDerivacion}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        detallesCache[idDerivacion] = data;
+                        cargarDetalles(idDerivacion, data);
+                    } else {
+                        alert('Error al cargar los detalles: ' + data.message);
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al cargar los detalles');
+                    return;
+                }
+            }
+            
+            detalleRow.style.display = 'table-row';
+            detalleBox.style.display = 'block';
+            btn.textContent = 'Ocultar detalles';
+            btn.className = 'derivacion-btn-ocultar';
+        } else {
+            // Ocultar detalles
+            detalleRow.style.display = 'none';
+            detalleBox.style.display = 'none';
+            btn.textContent = 'Ver detalles';
+            btn.className = 'derivacion-btn-detalle';
+        }
+    }
+
+    function cargarDetalles(idDerivacion, data) {
+        document.getElementById(`detalle-paciente-${idDerivacion}`).textContent = data.paciente;
+        document.getElementById(`detalle-medico-${idDerivacion}`).textContent = data.medicoSolicitante;
+        document.getElementById(`detalle-tipo-doc-${idDerivacion}`).textContent = data.tipoDocumento;
+        document.getElementById(`detalle-nro-doc-${idDerivacion}`).textContent = data.numeroDocumento;
+        document.getElementById(`detalle-especialidad-${idDerivacion}`).textContent = data.especialidadSolicitada;
+        document.getElementById(`detalle-fecha-${idDerivacion}`).textContent = `${data.fechaSolicitud} - ${data.horaSolicitud}`;
+        document.getElementById(`detalle-seguro-${idDerivacion}`).textContent = data.seguro;
+        document.getElementById(`detalle-servicio-${idDerivacion}`).textContent = data.servicioOrigen;
+        document.getElementById(`detalle-motivo-${idDerivacion}`).textContent = data.motivoDerivacion;
+        document.getElementById(`detalle-idcita-${idDerivacion}`).textContent = '#' + data.idCita.toString().padStart(4, '0');
+        
+        const prioridadBadge = document.getElementById(`detalle-prioridad-${idDerivacion}`);
+        prioridadBadge.textContent = data.prioridad;
+        prioridadBadge.className = `derivacion-prioridad-badge ${data.prioridad === 'Normal' ? 'derivacion-prioridad-normal' : 'derivacion-prioridad-baja'}`;
+    }
+</script>
+}

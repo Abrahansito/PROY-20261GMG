@@ -1,0 +1,155 @@
+@{
+    ViewData["Title"] = "Editar Triaje de Paciente";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Triaje.css" asp-append-version="true" />
+}
+
+<div class="page-container">
+    <div class="triaje-header">
+        <h1><i class="fas fa-edit"></i> Editar Triaje de Paciente</h1>
+    </div>
+
+    <div class="alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Modo Edición:</strong> Está modificando un triaje existente. Los cambios se guardarán al presionar "Actualizar Triaje".
+    </div>
+
+    <!-- Información del Paciente -->
+    <div class="paciente-info">
+        <div class="info-item">
+            <span class="info-label">Paciente</span>
+            <span class="info-value" id="pacienteName">-</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Nº Documento</span>
+            <span class="info-value" id="pacienteDocumento">-</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Sexo</span>
+            <span class="info-value" id="pacienteSexo">-</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Edad</span>
+            <span class="info-value" id="pacienteEdad">-</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Tipo Documento</span>
+            <span class="info-value" id="pacienteTipo">-</span>
+        </div>
+    </div>
+
+    <!-- Formulario de Triaje -->
+    <form id="formTriaje" onsubmit="actualizarTriaje(event)">
+        <input type="hidden" id="idTriaje">
+        <input type="hidden" id="idPaciente">
+
+        <!-- Signos Vitales -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="fas fa-thermometer-half"></i> Signos Vitales</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="temperatura">Temperatura (°C) <span class="required">*</span></label>
+                    <input type="number" id="temperatura" name="temperatura" step="0.1" min="35" max="42" required placeholder="Ej: 36.5">
+                </div>
+                <div class="form-group">
+                    <label for="presionArterial">Presión Arterial (mmHg) <span class="required">*</span></label>
+                    <input type="number" id="presionArterial" name="presionArterial" min="0" required placeholder="Ej: 120">
+                </div>
+                <div class="form-group">
+                    <label for="frecuenciaCardiaca">Frecuencia Cardíaca (lpm) <span class="required">*</span></label>
+                    <input type="number" id="frecuenciaCardiaca" name="frecuenciaCardiaca" min="0" max="200" required placeholder="Ej: 75">
+                </div>
+                <div class="form-group">
+                    <label for="saturacion">Saturación de Oxígeno (%) <span class="required">*</span></label>
+                    <input type="number" id="saturacion" name="saturacion" min="0" max="100" required placeholder="Ej: 98">
+                </div>
+                <div class="form-group">
+                    <label for="frecuenciaRespiratoria">Frecuencia Respiratoria (rpm) <span class="required">*</span></label>
+                    <input type="number" id="frecuenciaRespiratoria" name="frecuenciaRespiratoria" min="0" max="100" required placeholder="Ej: 16">
+                </div>
+                <div class="form-group">
+                    <label for="pesoTriaje">Peso (kg) <span class="required">*</span></label>
+                    <input type="number" id="pesoTriaje" name="peso" step="0.1" min="0" required placeholder="Ej: 70.5">
+                </div>
+                <div class="form-group">
+                    <label for="tallaTriaje">Talla (cm) <span class="required">*</span></label>
+                    <input type="number" id="tallaTriaje" name="talla" step="0.1" min="0" required placeholder="Ej: 170">
+                </div>
+                <div class="form-group">
+                    <label for="perimAbdominal">Perímetro Abdominal (cm) <span class="required">*</span></label>
+                    <input type="number" id="perimAbdominal" name="perimAbdominal" step="0.1" min="0" required placeholder="Ej: 85">
+                </div>
+                <div class="form-group">
+                    <label for="superficieCorporal">Superficie Corporal (m²) <span class="required">*</span></label>
+                    <input type="number" id="superficieCorporal" name="superficieCorporal" step="0.01" min="0" required placeholder="Ej: 1.8">
+                </div>
+            </div>
+        </div>
+
+        <!-- Índices de Salud -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="fas fa-chart-line"></i> Índices de Salud</h2>
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label for="imc">IMC <span class="required">*</span></label>
+                    <input type="number" id="imc" name="imc" step="0.01" min="0" readonly placeholder="Se calcula automáticamente">
+                    <div class="imc-info" id="imcInfo">
+                        El IMC se calculará automáticamente cuando completes peso y talla
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="clasificacionImc">Clasificación IMC <span class="required">*</span></label>
+                    <input type="text" id="clasificacionImc" name="clasificacionImc" readonly placeholder="Se determina automáticamente">
+                </div>
+                <div class="form-group">
+                    <label for="riesgoEnfermedad">Riesgo de Enfermedad <span class="required">*</span></label>
+                    <select id="riesgoEnfermedad" name="riesgoEnfermedad" required>
+                        <option value="">Seleccione</option>
+                        <option value="Bajo">Bajo</option>
+                        <option value="Moderado">Moderado</option>
+                        <option value="Alto">Alto</option>
+                        <option value="Muy Alto">Muy Alto</option>
+                    </select>
+                    <div class="riesgo-info" id="riesgoInfo" style="display:none;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="estadoTriage">Estado del Triaje <span class="required">*</span></label>
+                    <select id="estadoTriage" name="estadoTriage" required>
+                        <option value="">Seleccione</option>
+                        <option value="Completado">Completado</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="En Revisión">En Revisión</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="fas fa-clipboard"></i> Observaciones</h2>
+            <div class="form-group full">
+                <label for="observaciones">Observaciones Adicionales</label>
+                <textarea id="observaciones" name="observaciones" placeholder="Ingrese observaciones adicionales sobre el estado del paciente..."></textarea>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                Actualizar Triaje
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="cancelarEdicion()">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/Triaje/editarTriaje.js" asp-append-version="true"></script>
+}

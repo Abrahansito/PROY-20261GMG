@@ -1,0 +1,482 @@
+@{
+    ViewData["Title"] = "Derivar a Especialidad";
+    var paciente = ViewBag.Paciente as SGMG.Models.Paciente;
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+<div class="page-container">
+    <h1 class="section-title">Derivar a Especialidad</h1>
+
+    <!-- Información del Paciente -->
+    <div class="filters-section" style="margin-bottom: 30px;">
+        <h2 style="font-size: 18px; font-weight: 600; color: var(--primary-color); margin-bottom: 20px; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px;">
+            Información del Paciente
+        </h2>
+        <div class="filters-grid" style="grid-template-columns: repeat(4, 1fr);">
+            <div class="form-group">
+                <label style="font-size: 12px; color: #7f8c8d; text-transform: uppercase;">DNI</label>
+                <p style="font-size: 14px; font-weight: 500; color: var(--text-color); margin: 0;">@paciente?.NumeroDocumento</p>
+            </div>
+            <div class="form-group">
+                <label style="font-size: 12px; color: #7f8c8d; text-transform: uppercase;">Nombre Completo</label>
+                <p style="font-size: 14px; font-weight: 500; color: var(--text-color); margin: 0;">@paciente?.Nombre @paciente?.ApellidoPaterno @paciente?.ApellidoMaterno</p>
+            </div>
+            <div class="form-group">
+                <label style="font-size: 12px; color: #7f8c8d; text-transform: uppercase;">Sexo</label>
+                <p style="font-size: 14px; font-weight: 500; color: var(--text-color); margin: 0;">@paciente?.Sexo</p>
+            </div>
+            <div class="form-group">
+                <label style="font-size: 12px; color: #7f8c8d; text-transform: uppercase;">Edad</label>
+                <p style="font-size: 14px; font-weight: 500; color: var(--text-color); margin: 0;">@paciente?.Edad años</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Derivación -->
+    <form id="derivacionForm" novalidate>
+        <input type="hidden" id="IdCitaOrigen" value="@ViewBag.IdCita" />
+        <input type="hidden" id="IdMedicoDestino" value="@ViewBag.Medico?.IdMedico" />
+
+        <div class="filters-section">
+            <h2 style="font-size: 18px; font-weight: 600; color: var(--primary-color); margin-bottom: 20px; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px;">
+                Derivar a Especialidad
+            </h2>
+
+            <!-- Mensaje de información -->
+            <div style="background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin-bottom: 25px; border-radius: 5px;">
+                <p style="margin: 0; font-size: 14px; color: #1976d2;">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Importante:</strong> Complete todos los campos requeridos. La derivación será enviada al Área de Admisión para programación de la cita.
+                </p>
+            </div>
+
+            <!-- Especialidad Solicitada -->
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label for="EspecialidadDestino">
+                    Especialidad Solicitada <span style="color: var(--danger-color);">*</span>
+                </label>
+                <select id="EspecialidadDestino" name="EspecialidadDestino" class="form-control">
+                    <option value="">Seleccione la especialidad médica a la que desea derivar al paciente</option>
+                    <option value="Cardiología">Cardiología</option>
+                    <option value="Neurología">Neurología</option>
+                    <option value="Gastroenterología">Gastroenterología</option>
+                    <option value="Traumatología">Traumatología</option>
+                    <option value="Dermatología">Dermatología</option>
+                    <option value="Oftalmología">Oftalmología</option>
+                    <option value="Otorrinolaringología">Otorrinolaringología</option>
+                    <option value="Urología">Urología</option>
+                    <option value="Ginecología">Ginecología</option>
+                    <option value="Pediatría">Pediatría</option>
+                    <option value="Psiquiatría">Psiquiatría</option>
+                    <option value="Endocrinología">Endocrinología</option>
+                    <option value="Neumología">Neumología</option>
+                    <option value="Nefrología">Nefrología</option>
+                    <option value="Reumatología">Reumatología</option>
+                    <option value="Oncología">Oncología</option>
+                    <option value="Hematología">Hematología</option>
+                    <option value="Infectología">Infectología</option>
+                </select>
+                <span id="errorEspecialidad" class="error-message">Debe seleccionar una especialidad</span>
+            </div>
+
+            <!-- Prioridad -->
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label>Prioridad <span style="color: var(--danger-color);">*</span></label>
+                <div style="display: flex; gap: 30px; margin-top: 10px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
+                        <input type="radio" name="Prioridad" value="Normal" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="font-size: 14px;">Normal</span>
+                        <small style="color: #7f8c8d; font-size: 12px;">(consulta programada regular)</small>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
+                        <input type="radio" name="Prioridad" value="Urgente" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="font-size: 14px; color: var(--warning-color); font-weight: 500;">Urgente</span>
+                        <small style="color: #7f8c8d; font-size: 12px;">(requiere atención preferente)</small>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
+                        <input type="radio" name="Prioridad" value="Emergencia" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="font-size: 14px; color: var(--danger-color); font-weight: 500;">Emergencia</span>
+                        <small style="color: #7f8c8d; font-size: 12px;">(requiere atención inmediata)</small>
+                    </label>
+                </div>
+                <span id="errorPrioridad" class="error-message">Debe seleccionar una prioridad</span>
+            </div>
+
+            <!-- Motivo de la Derivación -->
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label for="MotivoDerivacion">
+                    Motivo de la Derivación <span style="color: var(--danger-color);">*</span>
+                </label>
+                <textarea 
+                    id="MotivoDerivacion" 
+                    name="MotivoDerivacion" 
+                    class="form-control" 
+                    rows="5" 
+                    maxlength="300"
+                    placeholder="Paciente con antecedentes de hipertensión arterial. Presenta episodios de taquicardia y dolor precordial intermitente en las últimas dos semanas. Se requiere evaluación cardiológica para descartar patología cardiovascular."></textarea>
+                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                    <span id="errorMotivo" class="error-message">El motivo de la derivación es un campo requerido</span>
+                    <small style="color: #7f8c8d; font-size: 12px;">
+                        Sea específico sobre los síntomas, hallazgos clínicos, resultados de exámenes previos y la razón médica por la cual se solicita la interconsulta.
+                    </small>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="filters-actions">
+                <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <button type="submit" class="btn btn-success" id="btnGuardar">
+                    <i class="fas fa-save"></i> Guardar Derivación
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Modal de Error -->
+<div id="derivacionModalError" class="deriv-modal-overlay">
+    <div class="deriv-modal-container">
+        <div class="deriv-modal-header">
+            <div class="deriv-modal-icon">⚠️</div>
+            <h2 class="deriv-modal-title">Error al Guardar</h2>
+        </div>
+        <div class="deriv-modal-body">
+            <p class="deriv-modal-message" id="derivacionModalErrorMessage">
+                No se pudo registrar la derivación. Por favor, intente nuevamente.
+            </p>
+        </div>
+        <div class="deriv-modal-footer">
+            <button type="button" class="deriv-modal-btn deriv-modal-btn-primary" onclick="cerrarModalDerivacion()">
+                Entendido
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Éxito -->
+<div id="derivacionModalSuccess" class="deriv-modal-overlay">
+    <div class="deriv-modal-container">
+        <div class="deriv-modal-header success">
+            <div class="deriv-modal-icon">✓</div>
+            <h2 class="deriv-modal-title">Derivación Registrada</h2>
+        </div>
+        <div class="deriv-modal-body">
+            <p class="deriv-modal-message" id="derivacionModalSuccessMessage">
+                Derivación creada exitosamente.
+            </p>
+        </div>
+        <div class="deriv-modal-footer">
+            <button type="button" class="deriv-modal-btn deriv-modal-btn-success" onclick="cerrarModalSuccessDerivacion()">
+                Aceptar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('derivacionForm');
+    const especialidadSelect = document.getElementById('EspecialidadDestino');
+    const motivoTextarea = document.getElementById('MotivoDerivacion');
+    const btnGuardar = document.getElementById('btnGuardar');
+    const idCitaOrigen = document.getElementById('IdCitaOrigen').value;
+    const idMedicoDestino = document.getElementById('IdMedicoDestino').value;
+
+    // Validación del formulario al enviar
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Limpiar errores previos
+        document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+        document.querySelectorAll('.form-control').forEach(el => el.classList.remove('error'));
+        
+        let hasErrors = false;
+        
+        // Validación 1: Especialidad
+        const especialidad = especialidadSelect.value;
+        if (!especialidad || especialidad === '') {
+            document.getElementById('errorEspecialidad').classList.add('show');
+            especialidadSelect.classList.add('error');
+            hasErrors = true;
+        }
+        
+        // Validación 2: Prioridad
+        const prioridadRadio = document.querySelector('input[name="Prioridad"]:checked');
+        if (!prioridadRadio) {
+            document.getElementById('errorPrioridad').classList.add('show');
+            hasErrors = true;
+        }
+        
+        // Validación 3: Motivo de la derivación
+        const motivo = motivoTextarea.value.trim();
+        if (!motivo) {
+            document.getElementById('errorMotivo').classList.add('show');
+            motivoTextarea.classList.add('error');
+            hasErrors = true;
+        }
+        
+        // Si hay errores, hacer scroll al primer campo con error
+        if (hasErrors) {
+            const firstError = document.querySelector('.form-control.error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+            return false;
+        }
+        
+        // Si no hay errores, enviar con fetch
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        
+        try {
+            // Preparar los datos
+            const data = {
+                IdCitaOrigen: parseInt(idCitaOrigen),
+                EspecialidadDestino: especialidad,
+                Prioridad: prioridadRadio.value,
+                MotivoDerivacion: motivo,
+                IdMedicoDestino: idMedicoDestino ? parseInt(idMedicoDestino) : null
+            };
+            
+            // Enviar con fetch
+            const response = await fetch('/Derivacion/Create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                mostrarModalSuccessDerivacion(result.message);
+                btnGuardar.disabled = false;
+                btnGuardar.innerHTML = '<i class="fas fa-save"></i> Guardar Derivación';
+            } else {
+                mostrarModalErrorDerivacion(result.message);
+                btnGuardar.disabled = false;
+                btnGuardar.innerHTML = '<i class="fas fa-save"></i> Guardar Derivación';
+            }
+            
+        } catch (error) {
+            console.error('Error completo:', error);
+            mostrarModalErrorDerivacion('No se pudo registrar la derivación. Por favor, intente nuevamente.');
+            btnGuardar.disabled = false;
+            btnGuardar.innerHTML = '<i class="fas fa-save"></i> Guardar Derivación';
+        }
+    });
+
+    // Limpiar error de especialidad cuando cambia
+    especialidadSelect.addEventListener('change', function() {
+        this.classList.remove('error');
+        document.getElementById('errorEspecialidad').classList.remove('show');
+    });
+
+    // Limpiar error de prioridad cuando selecciona una opción
+    document.querySelectorAll('input[name="Prioridad"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.getElementById('errorPrioridad').classList.remove('show');
+        });
+    });
+
+    // Limpiar error de motivo cuando escribe
+    motivoTextarea.addEventListener('input', function() {
+        this.classList.remove('error');
+        document.getElementById('errorMotivo').classList.remove('show');
+    });
+
+    // Contador de caracteres para el motivo
+    motivoTextarea.addEventListener('input', function() {
+        const maxLength = 300;
+        const currentLength = this.value.length;
+        const remaining = maxLength - currentLength;
+        
+        // Crear o actualizar contador si no existe
+        let contador = this.parentElement.querySelector('.character-counter');
+        if (!contador) {
+            contador = document.createElement('small');
+            contador.className = 'character-counter';
+            contador.style.cssText = 'position: absolute; right: 0; bottom: -20px; color: #7f8c8d; font-size: 11px;';
+            this.parentElement.style.position = 'relative';
+            this.parentElement.appendChild(contador);
+        }
+        
+        contador.textContent = `${currentLength}/${maxLength} caracteres`;
+        contador.style.color = remaining < 50 ? 'var(--danger-color)' : '#7f8c8d';
+    });
+});
+
+function mostrarModalErrorDerivacion(mensaje) {
+    const modal = document.getElementById('derivacionModalError');
+    const modalMessage = document.getElementById('derivacionModalErrorMessage');
+    
+    if (modalMessage && mensaje) {
+        modalMessage.textContent = mensaje;
+    }
+    
+    if (modal) {
+        modal.classList.add('deriv-modal-active');
+    }
+}
+
+function cerrarModalDerivacion() {
+    const modal = document.getElementById('derivacionModalError');
+    if (modal) {
+        modal.classList.remove('deriv-modal-active');
+    }
+}
+
+function mostrarModalSuccessDerivacion(mensaje) {
+    const modal = document.getElementById('derivacionModalSuccess');
+    const modalMessage = document.getElementById('derivacionModalSuccessMessage');
+    
+    if (modalMessage && mensaje) {
+        modalMessage.textContent = mensaje;
+    }
+    
+    if (modal) {
+        modal.classList.add('deriv-modal-active');
+    }
+}
+
+function cerrarModalSuccessDerivacion() {
+    const modal = document.getElementById('derivacionModalSuccess');
+    if (modal) {
+        modal.classList.remove('deriv-modal-active');
+    }
+}
+</script>
+
+@section Styles {
+<style>
+    .error-message {
+        color: var(--danger-color);
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+    }
+    
+    .error-message.show {
+        display: block;
+    }
+    
+    .form-control.error {
+        border-color: var(--danger-color);
+        background-color: #fff5f5;
+    }
+    
+    .form-control.error:focus {
+        border-color: var(--danger-color);
+        box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+    }
+
+    /* Estilos del Modal */
+    .deriv-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 99999;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .deriv-modal-overlay.deriv-modal-active {
+        display: flex !important;
+    }
+
+    .deriv-modal-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 90%;
+        overflow: hidden;
+    }
+
+    .deriv-modal-header {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .deriv-modal-header.success {
+        background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    }
+
+    .deriv-modal-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    .deriv-modal-title {
+        color: white;
+        font-size: 22px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .deriv-modal-body {
+        padding: 32px 24px;
+    }
+
+    .deriv-modal-message {
+        color: #495057;
+        font-size: 16px;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .deriv-modal-footer {
+        padding: 0 24px 24px 24px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    .deriv-modal-btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .deriv-modal-btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+    }
+
+    .deriv-modal-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+    }
+
+    .deriv-modal-btn-success {
+        background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        color: white;
+    }
+
+    .deriv-modal-btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    }
+</style>
+}</document_content>

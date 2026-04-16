@@ -1,0 +1,572 @@
+@{
+    ViewData["Title"] = "Historial de Citas";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+@section Styles {
+    <style>
+        .citas-container {
+            background-color: #f5f7fa;
+            min-height: calc(100vh - var(--navbar-height));
+            padding: 30px 20px;
+        }
+
+        .citas-header {
+            background: linear-gradient(135deg, #2c5282 0%, #2b6cb0 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .hospital-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .info-paciente {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .info-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c5282;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .historial-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .historial-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c5282;
+            margin-bottom: 20px;
+        }
+
+        .citas-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .citas-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .citas-table thead {
+            background-color: #f7fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .citas-table th {
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .citas-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        .citas-table tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        .citas-table tbody tr:hover {
+            background-color: #f7fafc;
+        }
+
+        .btn-ver-detalles {
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-ver-detalles:hover {
+            background-color: #2c5282;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(49, 130, 206, 0.3);
+        }
+
+        .btn-ocultar-detalles {
+            background-color: #718096;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-ocultar-detalles:hover {
+            background-color: #4a5568;
+            transform: translateY(-1px);
+        }
+
+           .detalles-cita {
+            background: white;
+            color: #2d3748;
+            padding: 25px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #6366f1;
+            border-top: 4px solid #8b5cf6;
+        }
+
+        .detalles-cita.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+      
+
+        .detalles-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .detalles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detalle-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detalle-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            opacity: 0.9;
+            letter-spacing: 0.5px;
+        }
+
+        .detalle-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .mensaje-vacio {
+            text-align: center;
+            padding: 50px 20px;
+            color: #718096;
+        }
+
+        .mensaje-vacio-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .mensaje-vacio-text {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .alert-error-historial {
+            background-color: #fed7d7;
+            color: #c53030;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #e53e3e;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mostrar-registros {
+            color: #718096;
+            font-size: 13px;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+       
+    </style>
+}
+
+<div class="citas-container">
+    <div class="citas-header">
+        <div class="hospital-title">Hospital Nacional Hipólito Unanue</div>
+        <div class="user-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Médico</span>
+        </div>
+    </div>
+
+    @if (ViewBag.Paciente != null)
+    {
+        <div class="info-paciente">
+            <div class="info-title">Información del Paciente</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">DNI</div>
+                    <div class="info-value">@ViewBag.Paciente.Dni</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Nombre Completo</div>
+                    <div class="info-value">@ViewBag.Paciente.NombreCompleto</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Sexo</div>
+                    <div class="info-value">@ViewBag.Paciente.Sexo</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Edad</div>
+                    <div class="info-value">@ViewBag.Paciente.Edad años</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Seguro</div>
+                    <div class="info-value">@ViewBag.Paciente.Seguro</div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="historial-section">
+        <div class="historial-title">Historial de Citas</div>
+
+        @if (ViewBag.ErrorCargaHistorial != null)
+        {
+            <div class="alert-error-historial">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>@ViewBag.ErrorCargaHistorial</span>
+            </div>
+        }
+        else if (ViewBag.TieneCitas == false)
+        {
+            <div class="mensaje-vacio">
+                <div class="mensaje-vacio-icon">📋</div>
+                <div class="mensaje-vacio-text">El paciente no tiene un historial de citas.</div>
+            </div>
+        }
+        else
+        {
+            <div class="citas-table-wrapper">
+                <table class="citas-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fecha Cita</th>
+                            <th>Hora</th>
+                            <th>Tipo y N° Doc</th>
+                            <th>Apellidos y Nombres</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int contador = 1;
+                        }
+                        @foreach (var cita in ViewBag.Citas)
+                        {
+                            <tr>
+                                <td>@contador</td>
+                                <td>@cita.FechaCita.ToString("dd/MM/yyyy")</td>
+                                <td>@cita.HoraCita.ToString(@"hh\:mm")</td>
+                                <td>@cita.TipoDocumento - @cita.NumeroDocumento</td>
+                                <td>@cita.NombreCompleto</td>
+                                <td>
+                                    <button class="btn-ver-detalles" onclick="toggleDetalles(@cita.Id, this)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        Ver detalles
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="6" style="padding: 0; border: none;">
+                                    <div class="detalles-cita" id="detalles-@cita.Id">
+                                        <div class="detalles-header">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                <polyline points="14 2 14 8 20 8"></polyline>
+                                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                                <polyline points="10 9 9 9 8 9"></polyline>
+                                            </svg>
+                                            Información de la Cita
+                                        </div>
+                                        <div class="detalles-grid">
+                                            <div class="detalle-item">
+                                                <div class="detalle-label">Fecha de Cita</div>
+                                                <div class="detalle-value" data-field="fecha">@cita.FechaCita.ToString("dd/MM/yyyy")</div>
+                                            </div>
+                                            <div class="detalle-item">
+                                                <div class="detalle-label">Hora</div>
+                                                <div class="detalle-value" data-field="hora">@cita.HoraCita.ToString(@"hh\:mm")</div>
+                                            </div>
+                                            <div class="detalle-item">
+                                                <div class="detalle-label">Médico</div>
+                                                <div class="detalle-value" data-field="medico">@cita.NombreMedico</div>
+                                            </div>
+                                            <div class="detalle-item">
+                                                <div class="detalle-label">Especialidad</div>
+                                                <div class="detalle-value" data-field="especialidad">@cita.Especialidad</div>
+                                            </div>
+                                            <div class="detalle-item">
+                                                <div class="detalle-label">Consultorio</div>
+                                                <div class="detalle-value" data-field="consultorio">@cita.Consultorio</div>
+                                            </div>
+                                            <div class="detalle-item">
+                                                <div class="detalle-label">Estado</div>
+                                                <div class="detalle-value" data-field="estado">@cita.EstadoCita</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            contador++;
+                        }
+                    </tbody>
+                </table>
+                <div class="mostrar-registros">
+                    Mostrando 1 a @ViewBag.Citas.Count de @ViewBag.Citas.Count registros
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const ICON_VER = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            Ver detalles
+        `;
+
+        const ICON_OCULTAR = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+            Ocultar detalles
+        `;
+
+        const ICON_LOADING = `
+            <svg width="14" height="14" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" opacity="0.25"/>
+                <path d="M12 2 A10 10 0 0 1 22 12" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round">
+                    <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+                </path>
+            </svg>
+            Cargando...
+        `;
+
+        async function toggleDetalles(id, button) {
+            console.log('═══════════════════════════════════════════════════════');
+            console.log('🔵 FUNCIÓN toggleDetalles LLAMADA');
+            console.log('📦 Parámetro id recibido:', id);
+            console.log('📊 Tipo de dato de id:', typeof id);
+            console.log('🔢 Valor numérico de id:', Number(id));
+            console.log('✅ ¿Es un número válido?', !isNaN(id) && id !== null && id !== undefined);
+            console.log('═══════════════════════════════════════════════════════');
+
+            const detallesDiv = document.getElementById(`detalles-${id}`);
+
+            if (!detallesDiv) {
+                console.error('❌ ERROR: No se encontró el div de detalles para la cita', id);
+                console.error('🔍 Se buscó el elemento con ID:', `detalles-${id}`);
+                alert('Error: No se puede mostrar los detalles de esta cita.');
+                return;
+            }
+
+            console.log('✅ Div de detalles encontrado:', detallesDiv);
+            const isVisible = detallesDiv.classList.contains('show');
+            console.log('👁️ ¿Detalles visibles actualmente?', isVisible);
+
+            if (isVisible) {
+                console.log('➡️ Acción: OCULTAR detalles');
+                ocultarDetalles(detallesDiv, button);
+            } else {
+                console.log('➡️ Acción: MOSTRAR detalles (llamando al servidor)');
+                await mostrarDetalles(id, detallesDiv, button);
+            }
+        }
+
+        function ocultarDetalles(detallesDiv, button) {
+            detallesDiv.classList.remove('show');
+            button.className = 'btn-ver-detalles';
+            button.innerHTML = ICON_VER;
+        }
+
+        async function mostrarDetalles(id, detallesDiv, button) {
+            console.log('\n🚀 ═══════════════════════════════════════════════════════');
+            console.log('🚀 INICIANDO SOLICITUD AL SERVIDOR');
+            console.log('═══════════════════════════════════════════════════════');
+            console.log('📤 ID de Cita que se enviará:', id);
+            console.log('📊 Tipo de dato:', typeof id);
+            console.log('🔢 Valor convertido a número:', Number(id));
+            console.log('🔗 URL que se construirá:', `/Citas/ObtenerDetallesCita?id=${id}`);
+            console.log('═══════════════════════════════════════════════════════\n');
+
+            button.disabled = true;
+            button.innerHTML = ICON_LOADING;
+
+            try {
+                const url = `/Citas/ObtenerDetallesCita?id=${id}`;
+                console.log('🌐 URL COMPLETA DEL FETCH:', url);
+                console.log('⏳ Enviando petición HTTP GET...\n');
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('📨 ═══════════════════════════════════════════════════════');
+                console.log('📨 RESPUESTA DEL SERVIDOR RECIBIDA');
+                console.log('═══════════════════════════════════════════════════════');
+                console.log('✅ Status HTTP:', response.status);
+                console.log('✅ Status Text:', response.statusText);
+                console.log('✅ OK:', response.ok);
+                console.log('✅ URL de respuesta:', response.url);
+                console.log('═══════════════════════════════════════════════════════\n');
+
+                if (!response.ok) {
+                    console.error('❌ ERROR HTTP:', response.status, response.statusText);
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('📦 ═══════════════════════════════════════════════════════');
+                console.log('📦 DATOS JSON PARSEADOS');
+                console.log('═══════════════════════════════════════════════════════');
+                console.log('📦 Objeto completo:', data);
+                console.log('✅ success:', data.success);
+                console.log('📄 message:', data.message);
+                console.log('📋 data:', data.data);
+                console.log('═══════════════════════════════════════════════════════\n');
+
+                if (data.success) {
+                    console.log('✅ ÉXITO: Mostrando detalles de la cita');
+                    detallesDiv.classList.add('show');
+                    button.className = 'btn-ocultar-detalles';
+                    button.innerHTML = ICON_OCULTAR;
+                    button.disabled = false;
+                    console.log('✅ Detalles mostrados correctamente\n');
+                } else {
+                    const mensaje = data.message || 'No se pudieron cargar los detalles de esta cita. Intente de nuevo.';
+                    console.error('❌ ═══════════════════════════════════════════════════════');
+                    console.error('❌ ERROR DEL SERVIDOR');
+                    console.error('═══════════════════════════════════════════════════════');
+                    console.error('❌ Mensaje:', mensaje);
+                    console.error('═══════════════════════════════════════════════════════\n');
+                    alert(mensaje);
+                    restaurarBoton(button);
+                }
+            } catch (error) {
+                console.error('💥 ═══════════════════════════════════════════════════════');
+                console.error('💥 EXCEPCIÓN CAPTURADA EN CATCH');
+                console.error('═══════════════════════════════════════════════════════');
+                console.error('💥 Tipo de error:', error.name);
+                console.error('💥 Mensaje de error:', error.message);
+                console.error('💥 Stack trace:', error.stack);
+                console.error('═══════════════════════════════════════════════════════\n');
+                alert('No se pudieron cargar los detalles de esta cita. Intente de nuevo.');
+                restaurarBoton(button);
+            }
+        }
+
+        function restaurarBoton(button) {
+            button.disabled = false;
+            button.className = 'btn-ver-detalles';
+            button.innerHTML = ICON_VER;
+        }
+    </script>
+}

@@ -1,0 +1,235 @@
+/* ==================== ESTILOS PARA MODALES DE GESTIÓN DE PERSONAL ==================== */
+
+/* Modal Base - Personal Management */
+.personal-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: personalModalFadeIn 0.3s;
+  overflow-y: auto;
+}
+.required {
+  color: var(--danger-color, #e74c3c);
+  margin-left: 2px;
+}
+@keyframes personalModalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.personal-modal.show {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal Content - Personal */
+.personal-modal-content {
+  background: white;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: personalModalSlideIn 0.3s;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  margin: 20px;
+}
+
+@keyframes personalModalSlideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Modal Header - Personal */
+.personal-modal-header {
+  padding: 20px 25px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  border-radius: 10px 10px 0 0;
+}
+
+.personal-modal-title {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin: 0;
+  font-weight: 600;
+}
+
+.personal-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #999;
+  line-height: 1;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s;
+}
+
+.personal-modal-close:hover {
+  color: #333;
+}
+
+/* Modal Body - Personal */
+.personal-modal-body {
+  padding: 25px;
+  max-height: calc(90vh - 160px);
+  overflow-y: auto;
+}
+
+/* Modal Footer - Personal */
+.personal-modal-footer {
+  padding: 20px 25px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: #f8f9fa;
+  border-radius: 0 0 10px 10px;
+}
+
+/* Form Sections - Personal */
+.personal-form-section {
+  margin-bottom: 25px;
+}
+
+.personal-form-section-title {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #3498db;
+  font-weight: 600;
+}
+
+.personal-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+/* Detail Grid - Personal */
+.personal-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.personal-detail-item {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 5px;
+  border: 1px solid #e9ecef;
+}
+
+.personal-detail-label {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+.personal-detail-value {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* Delete Confirmation Modal - Specific */
+.personal-delete-info {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 15px;
+}
+
+.personal-delete-info p {
+  margin: 8px 0;
+}
+
+.personal-delete-info strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+/* Scrollbar personalizado para modal de personal */
+.personal-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.personal-modal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.personal-modal-body::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.personal-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Responsive Modal - Personal */
+@media (max-width: 768px) {
+  .personal-modal-content {
+    width: 95%;
+    max-width: none;
+    margin: 10px;
+  }
+
+  .personal-modal-title {
+    font-size: 1.2rem;
+  }
+
+  .personal-modal-body {
+    padding: 20px 15px;
+  }
+
+  .personal-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .personal-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .personal-modal-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .personal-modal-footer .btn {
+    width: 100%;
+  }
+}
+
+/* Modal específico para eliminar - tamaño reducido */
+.personal-modal-content.personal-delete-modal {
+  max-width: 500px;
+}

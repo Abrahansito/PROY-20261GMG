@@ -1,0 +1,238 @@
+@model SGMG.Dtos.Request.Triaje.TriajeRequestDTO
+@{
+    ViewData["Title"] = "Editar Triaje";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";  // ✅ AGREGAR ESTA LÍNEA
+    var pacienteInfo = ViewBag.PacienteInfo as dynamic;
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Editar Triaje</h1>
+            <p class="mb-0">Modificar los datos del triaje del paciente</p>
+        </div>
+        <a href="@Url.Action("Listado", "Triaje")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver al Listado
+        </a>
+    </div>
+
+    <!-- Información del Paciente -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h6 class="m-0 font-weight-bold">Información del Paciente</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <strong>Paciente:</strong> @pacienteInfo?.NombreCompleto
+                </div>
+                <div class="col-md-3">
+                    <strong>Documento:</strong> @pacienteInfo?.Documento
+                </div>
+                <div class="col-md-2">
+                    <strong>Sexo:</strong> @pacienteInfo?.Sexo
+                </div>
+                <div class="col-md-2">
+                    <strong>Edad:</strong> @pacienteInfo?.Edad años
+                </div>
+                <div class="col-md-2">
+                    <strong>ID Paciente:</strong> @pacienteInfo?.IdPaciente
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Edición -->
+    <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+            <h6 class="m-0 font-weight-bold">Datos del Triaje</h6>
+        </div>
+        <div class="card-body">
+            <!-- ✅ CORREGIDO: Cambiar asp-action para que apunte al método correcto -->
+            <form asp-action="Editar" asp-route-id="@Model.IdTriaje" method="post" id="triajeForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="IdTriaje" />
+                <input type="hidden" asp-for="IdPaciente" />    
+
+                <!-- Signos Vitales -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="text-primary mb-3">Signos Vitales</h5>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Temperatura" class="form-label">Temperatura (°C)</label>
+                        <input asp-for="Temperatura" class="form-control" type="number" step="0.1" min="35" max="42" />
+                        <span asp-validation-for="Temperatura" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="PresionArterial" class="form-label">Presión Arterial</label>
+                        <input asp-for="PresionArterial" class="form-control" type="number" min="60" max="200" />
+                        <span asp-validation-for="PresionArterial" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Saturacion" class="form-label">Saturación O2 (%)</label>
+                        <input asp-for="Saturacion" class="form-control" type="number" min="70" max="100" />
+                        <span asp-validation-for="Saturacion" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="FrecuenciaCardiaca" class="form-label">Frec. Cardíaca (lpm)</label>
+                        <input asp-for="FrecuenciaCardiaca" class="form-control" type="number" min="40" max="180" />
+                        <span asp-validation-for="FrecuenciaCardiaca" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="FrecuenciaRespiratoria" class="form-label">Frec. Respiratoria (rpm)</label>
+                        <input asp-for="FrecuenciaRespiratoria" class="form-control" type="number" min="8" max="40" />
+                        <span asp-validation-for="FrecuenciaRespiratoria" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Medidas Antropométricas -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="text-primary mb-3">Medidas Antropométricas</h5>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Peso" class="form-label">Peso (kg)</label>
+                        <input asp-for="Peso" class="form-control" type="number" step="0.1" min="2" max="200" />
+                        <span asp-validation-for="Peso" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Talla" class="form-label">Talla (m)</label>
+                        <input asp-for="Talla" class="form-control" type="number" step="0.01" min="0.5" max="2.5" />
+                        <span asp-validation-for="Talla" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="PerimAbdominal" class="form-label">Perímetro Abdominal (cm)</label>
+                        <input asp-for="PerimAbdominal" class="form-control" type="number" step="0.1" min="40" max="150" />
+                        <span asp-validation-for="PerimAbdominal" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="SuperficieCorporal" class="form-label">Superficie Corporal (m²)</label>
+                        <input asp-for="SuperficieCorporal" class="form-control" type="number" step="0.01" min="0.5" max="3.0" />
+                        <span asp-validation-for="SuperficieCorporal" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Imc" class="form-label">IMC</label>
+                        <input asp-for="Imc" class="form-control" type="number" step="0.1" min="10" max="60" readonly />
+                        <span asp-validation-for="Imc" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="ClasificacionImc" class="form-label">Clasificación IMC</label>
+                        <input asp-for="ClasificacionImc" class="form-control" readonly />
+                        <span asp-validation-for="ClasificacionImc" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Evaluación -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="text-primary mb-3">Evaluación</h5>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="RiesgoEnfermedad" class="form-label">Riesgo de Enfermedad</label>
+                        <select asp-for="RiesgoEnfermedad" class="form-control">
+                            <option value="">Seleccionar...</option>
+                            <option value="Bajo">Bajo</option>
+                            <option value="Moderado">Moderado</option>
+                            <option value="Alto">Alto</option>
+                            <option value="Muy Alto">Muy Alto</option>
+                        </select>
+                        <span asp-validation-for="RiesgoEnfermedad" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="EstadoTriage" class="form-label">Estado de Triaje</label>
+                        <select asp-for="EstadoTriage" class="form-control">
+                            <option value="">Seleccionar...</option>
+                            <option value="Estable">Estable</option>
+                            <option value="Inestable">Inestable</option>
+                            <option value="Urgente">Urgente</option>
+                            <option value="Emergencia">Emergencia</option>
+                        </select>
+                        <span asp-validation-for="EstadoTriage" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label asp-for="Observaciones" class="form-label">Observaciones</label>
+                        <textarea asp-for="Observaciones" class="form-control" rows="4" placeholder="Ingrese observaciones relevantes..."></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end gap-2">
+                            <!-- ✅ CORREGIDO: Cambiar a TriajeController -->
+                            <a href="@Url.Action("Listado", "Triaje")" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        // Cálculo automático de IMC
+        function calcularIMC() {
+            const peso = parseFloat(document.getElementById('Peso').value) || 0;
+            const talla = parseFloat(document.getElementById('Talla').value) || 0;
+            
+            if (peso > 0 && talla > 0) {
+                const imc = peso / (talla * talla);
+                document.getElementById('Imc').value = imc.toFixed(2);
+                
+                // Clasificación del IMC
+                let clasificacion = '';
+                if (imc < 18.5) clasificacion = 'Bajo peso';
+                else if (imc < 25) clasificacion = 'Normal';
+                else if (imc < 30) clasificacion = 'Sobrepeso';
+                else if (imc < 35) clasificacion = 'Obesidad Grado I';
+                else if (imc < 40) clasificacion = 'Obesidad Grado II';
+                else clasificacion = 'Obesidad Grado III';
+                
+                document.getElementById('ClasificacionImc').value = clasificacion;
+            }
+        }
+
+        // Event listeners para cálculo automático
+        document.getElementById('Peso').addEventListener('input', calcularIMC);
+        document.getElementById('Talla').addEventListener('input', calcularIMC);
+
+        // Validación del formulario
+        document.getElementById('triajeForm').addEventListener('submit', function(e) {
+            const peso = parseFloat(document.getElementById('Peso').value);
+            const talla = parseFloat(document.getElementById('Talla').value);
+            
+            if (peso > 0 && talla > 0 && (talla < 0.5 || talla > 2.5)) {
+                e.preventDefault();
+                alert('La talla debe estar entre 0.5 y 2.5 metros');
+                return false;
+            }
+        });
+
+        // Calcular IMC al cargar la página si hay valores
+        document.addEventListener('DOMContentLoaded', function() {
+            calcularIMC();
+        });
+    </script>
+}

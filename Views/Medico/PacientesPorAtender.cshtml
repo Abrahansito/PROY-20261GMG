@@ -1,0 +1,186 @@
+@model IEnumerable<SGMG.Dtos.Response.CitaPorAtenderDTO>
+@{
+    ViewData["Title"] = "Pacientes por Atender";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+<style>
+    .header-info {
+        background: #1b6ec2; /* Color solicitado */
+        color: white;
+        padding: 20px;
+        border-radius: 8px 8px 0 0;
+    }
+    .search-box {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 0 0 8px 8px;
+        border: 1px solid #dee2e6;
+        border-top: none;
+    }
+    .table-custom {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .table thead th {
+        background: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        color: #495057;
+    }
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    .btn-atender {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+    .btn-atender:hover {
+        background: #218838;
+        transform: scale(1.05);
+    }
+    .badge-estado {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        border-radius: 12px;
+    }
+    .no-patients {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="table-custom">
+        <div class="header-info">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4 class="mb-1">
+                        <i class="fas fa-user-md me-2"></i>@ViewBag.MedicoNombre
+                    </h4>
+                    <p class="mb-0">
+                        <i class="fas fa-clinic-medical me-2"></i>Consultorio: @ViewBag.Consultorio
+                        <span class="mx-3">|</span>
+                        <i class="fas fa-calendar-day me-2"></i>Fecha: @ViewBag.FechaHoy
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="badge bg-light text-dark fs-6">
+                        <i class="fas fa-users me-1"></i>
+                        @ViewBag.TotalCitas Pacientes
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <form method="post" action="/medico/pacientes-por-atender/buscar" class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold">Buscar paciente</label>
+                    <input type="text" name="filtro" class="form-control" 
+                           placeholder="Buscar por DNI, nombre o apellido..." 
+                           value="@ViewBag.Filtro">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Buscar
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a href="/medico/pacientes-por-atender" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-refresh me-2"></i>Limpiar
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="no-patients">
+                <i class="fas fa-user-injured fa-3x mb-3 text-muted"></i>
+                <h4 class="text-muted">No hay pacientes por atender</h4>
+                <p class="text-muted">No se encontraron citas programadas para hoy.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>DNI</th>
+                            <th>Nombre completo</th>
+                            <th>Fecha de cita</th>
+                            <th>Hora</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var cita in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@cita.NumeroDocumento</strong>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">@cita.NombreCompleto</div>
+                                    <small class="text-muted">
+                                        <i class="fas @(cita.Sexo == "M" ? "fa-mars" : "fa-venus") me-1"></i>
+                                        @cita.Sexo | @cita.Edad años
+                                    </small>
+                                </td>
+                                <td>@cita.FechaCita.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <span class="fw-bold">@cita.HoraCita.ToString(@"hh\:mm") hrs</span>
+                                </td>
+                                <td>
+                                    <span class="badge-estado 
+                                        @(cita.EstadoCita == "Confirmada" ? "bg-success" : 
+                                          cita.EstadoCita == "Reservada" ? "bg-info" : "bg-warning text-dark")">
+                                        @cita.EstadoCita
+                                    </span>
+                                </td>
+                                <td>
+    <button 
+        class="btn-atender" 
+        onclick="atenderPaciente(@cita.IdPaciente)">
+        <i class="fas fa-stethoscope me-1"></i>Atender
+    </button>
+</td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function atenderPaciente(idPaciente) {
+            // Aquí implementarás la lógica para atender al paciente
+            window.location.href = `/historia-clinica/ver?idPaciente=${idPaciente}`;
+            // window.location.href = '/medico/atender-paciente/' + idCita;
+        }
+
+        // Auto-refresh cada 5 minutos para ver nuevas citas
+        setInterval(function() {
+            // Opcional: recargar la página para ver citas nuevas
+            // window.location.reload();
+        }, 300000); // 5 minutos
+    </script>
+}

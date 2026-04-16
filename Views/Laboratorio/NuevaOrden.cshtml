@@ -1,0 +1,66 @@
+@{
+    ViewData["Title"] = "Nueva Orden de Laboratorio";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/laboratorio.css" asp-append-version="true" />
+}
+
+<div class="container">
+    <!-- Información del Paciente -->
+    <div class="patient-info-card" id="patientInfo">
+        <h2 class="patient-info-title">Información del Paciente</h2>
+        <div class="loading">Cargando información del paciente...</div>
+    </div>
+
+    <!-- Formulario Nueva Orden -->
+    <div class="form-card">
+        <h2 class="form-title">Nueva Orden de Laboratorio</h2>
+
+        <form id="formNuevaOrden" onsubmit="guardarOrden(event)">
+            <div class="form-group">
+                <label class="form-label">
+                    Tipo de Examen <span class="required">*</span>
+                </label>
+                <select class="form-select" id="tipoExamen" required>
+                    <option value="">Seleccione un examen</option>
+                    <option value="Análisis de Sangre">Análisis de Sangre</option>
+                    <option value="Análisis de Orina">Análisis de Orina</option>
+                    <option value="Examen Microbiológico">Examen Microbiológico</option>
+                    <option value="Perfil Lipídico">Perfil Lipídico</option>
+                    <option value="Hemograma Completo">Hemograma Completo</option>
+                    <option value="Glucosa en Sangre">Glucosa en Sangre</option>
+                    <option value="Cultivo de Orina">Cultivo de Orina</option>
+                    <option value="Prueba de Función Hepática">Prueba de Función Hepática</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Observaciones Adicionales</label>
+                <textarea 
+                    class="form-textarea" 
+                    id="observaciones"
+                    placeholder="Incluya información clínica relevante, medicamentos actuales, o instrucciones especiales..."></textarea>
+                <p class="form-help">
+                    Incluya información clínica relevante, medicamentos actuales, o instrucciones especiales.
+                </p>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="volver()">
+                    ← Volver
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    ✓ Guardar Orden
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/laboratorio-nueva-orden.js" asp-append-version="true"></script>
+}
+

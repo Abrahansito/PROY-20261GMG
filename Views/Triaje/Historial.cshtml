@@ -1,0 +1,31 @@
+@{
+    ViewData["Title"] = "Historial de Triajes";
+    Layout = "~/Views/Shared/_LayoutA.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Historial.css" asp-append-version="true" />
+}
+
+<div class="container">
+    <!-- Información del Paciente -->
+    <div class="patient-info-card" id="patientInfo">
+        <h2 class="patient-info-title">Información del Paciente</h2>
+        <div class="loading">Cargando información del paciente...</div>
+    </div>
+
+    <!-- Historial de Triajes -->
+    <div class="triaje-history-card">
+        <div class="triaje-history-header">
+            <h2 class="triaje-history-title">Historial de Triajes</h2>
+        </div>
+
+        <div id="triajeHistoryContainer">
+            <div class="loading">Cargando historial de triajes...</div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/Triaje/triaje-historial.js" asp-append-version="true"></script>
+}
