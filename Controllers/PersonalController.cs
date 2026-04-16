@@ -23,7 +23,7 @@ namespace SGMG.Controllers
       _logger = logger;
       _personalService = personalService;
     }
-
+ // Vista de subir detalles
     [HttpGet]
     [Route("/personal/resumen")]
     public async Task<ActionResult<GenericResponse<ResumenPersonalResponse>>> GetResumenPersonal()
@@ -31,7 +31,7 @@ namespace SGMG.Controllers
       _logger.LogInformation("Iniciando obtención de resumen de personal");
       return await _personalService.GetResumenPersonalAsync();
     }
-
+ // Vista de subir detalles
     [HttpPost]
     [Route("/personal/buscar")]
     public async Task<ActionResult<GenericResponse<IEnumerable<PersonalRegistradoResponse>>>> BuscarPersonal([FromBody] PersonalFiltroRequest filtro)
