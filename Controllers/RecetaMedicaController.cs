@@ -27,9 +27,7 @@ namespace PROY_20252SGMG.Controllers
       _context = context;
     }
 
-    /// <summary>
-    /// Agregar un medicamento individual con estado PENDIENTE
-    /// </summary>
+   
     [HttpPost]
     [Route("AgregarMedicamento")]
     public async Task<ActionResult<GenericResponse<DetalleRecetaResponseDTO>>> AgregarMedicamento(
@@ -51,9 +49,7 @@ namespace PROY_20252SGMG.Controllers
       }
     }
 
-    /// <summary>
-    /// Obtener medicamentos PENDIENTES por HC, Médico y Paciente
-    /// </summary>
+ 
     [HttpGet]
     [Route("MedicamentosPendientes")]
     public async Task<ActionResult<GenericResponse<IEnumerable<DetalleRecetaResponseDTO>>>> GetMedicamentosPendientes(
