@@ -31,7 +31,6 @@ namespace SGMG.Controllers
       _historialService = historialService;
     }
 
-    //NUEVOS ENDPOINTS
 
     [HttpGet]
     [Route("/historia-clinica/ver")]
