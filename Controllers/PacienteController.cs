@@ -32,14 +32,14 @@ namespace SGMG.Controllers
       _context = context;
       _configuration = configuration;
     }
-
+ // Vista de subir detalles
     [HttpGet]
     [Route("/pacientes/all")]
     public async Task<GenericResponse<IEnumerable<Paciente>>> GetAllPacientes()
     {
       return await _pacienteService.GetAllPacientesAsync();
     }
-
+ // Vista de subir detalles
     [HttpGet]
     [Route("/pacientes/search")]
     public async Task<GenericResponse<Paciente>> SearchPaciente([FromQuery] string tipoDocumento, [FromQuery] string numeroDocumento)
