@@ -49,7 +49,7 @@ public class HomeController : Controller
       return RedirectToAction("Index");
     }
 
-    // Envía el ID a la vista, útil si vas a hacer una consulta en JS o Razor
+   
     ViewBag.IdPaciente = idPaciente;
 
     return View();
