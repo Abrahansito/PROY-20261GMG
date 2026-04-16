@@ -15,9 +15,9 @@ namespace PROY_20252SGMG.Controllers
   public class CitasController : Controller
   {
     private readonly ApplicationDbContext _context;
-    private readonly ILogger<CitasController> _logger; // ✅ Logger
+    private readonly ILogger<CitasController> _logger; 
 
-    // Inyectamos el logger en el constructor
+  
     public CitasController(ApplicationDbContext context, ILogger<CitasController> logger)
     {
       _context = context;
