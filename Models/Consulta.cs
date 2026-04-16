@@ -23,12 +23,12 @@ namespace SGMG.Models
         public string MotivoConsulta { get; set; } = "";
         public string SintomasPresentados { get; set; } = "";
 
-        // Diagnóstico
+  
         public string DiagnosticoPrincipal { get; set; } = "";
         public string CodigoCie10 { get; set; } = "";
         public string Observaciones { get; set; } = "";
 
-        // Evolución
+     
         public string DescripcionEvolucion { get; set; } = "";
         public string IndicacionesRecomendaciones { get; set; } = "";
 
