@@ -31,7 +31,6 @@ namespace SGMG.Controllers
       _context = context;
     }
 
-    // ============== RUTAS PARA VISTAS ==============
 
     [HttpGet]
     public async Task<IActionResult> Index()
@@ -49,7 +48,6 @@ namespace SGMG.Controllers
 
         var response = await _triajeService.GetHistorialTriajePacienteAsync(idPaciente);
 
-        // ✅ CORREGIDO: Usar ?? false para valores nullable
         if (response.Success ?? false)
         {
           return Ok(new
@@ -71,7 +69,7 @@ namespace SGMG.Controllers
       }
       catch (Exception ex)
       {
-        // 🔹 Captura de errores (por ejemplo, falla de conexión a la BD)
+  
         return StatusCode(500, new
         {
           success = false,
