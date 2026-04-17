@@ -35,7 +35,7 @@ namespace SGMG.Controllers
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-      await CargarDatosEnfermera();
+      //await CargarDatosEnfermera();
       return View();
     }
 
