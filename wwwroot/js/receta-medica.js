@@ -208,7 +208,8 @@ function actualizarTablaMedicamentos() {
 
 // ===== Eliminar medicamento =====
 async function eliminarMedicamento(idDetalle) {
-  if (!confirm("¿Desea eliminar este medicamento?")) return;
+  const confirmado = await window.sigmegConfirm("¿Desea eliminar este medicamento?");
+  if (!confirmado) return;
 
   try {
     const response = await fetch(

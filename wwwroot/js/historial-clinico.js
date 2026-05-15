@@ -13,14 +13,14 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Obtener parámetros de la URL
-function obtenerParametrosURL() {
+async function obtenerParametrosURL() {
   const params = new URLSearchParams(window.location.search);
   idPacienteActual = params.get("idPaciente");
   idMedicoActual = params.get("idMedico");
   idCitaActual = params.get("idCita");
 
   if (!idPacienteActual) {
-    alert("No se especificó el ID del paciente");
+    await window.sigmegAlert("No se especificó el ID del paciente", "warning");
     window.history.back();
   }
 }
@@ -282,8 +282,9 @@ function irADerivaciones() {
   window.location.href = `/HistorialDerivacion/Historial?idCita=${idPacienteActual}`;
 }
 
-function terminarCita() {
-  if (confirm("¿Está seguro de que desea terminar la cita?")) {
+async function terminarCita() {
+  const confirmado = await window.sigmegConfirm("¿Está seguro de que desea terminar la cita?");
+  if (confirmado) {
     // Aquí podrías actualizar el estado de la cita
     window.location.href = "/citas";
   }
@@ -337,7 +338,8 @@ terminarCita = async function () {
     return;
   }
 
-  if (!confirm("Â¿EstÃ¡ seguro de que desea terminar la cita?")) {
+  const confirmado = await window.sigmegConfirm("¿Está seguro de que desea terminar la cita?");
+  if (!confirmado) {
     return;
   }
 
@@ -349,7 +351,7 @@ terminarCita = async function () {
     const result = await res.json();
 
     if (result.success) {
-      alert(result.message || result.mensaje || "Cita terminada correctamente");
+      await window.sigmegAlert(result.message || result.mensaje || "Cita terminada correctamente", "success");
       window.location.href = "/medico/pacientes-por-atender";
     } else {
       alert(result.message || result.mensaje || "No se pudo terminar la cita");

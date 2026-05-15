@@ -13,12 +13,12 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Cargar datos del paciente desde parámetros
-function cargarDatosPaciente() {
+async function cargarDatosPaciente() {
   const params = new URLSearchParams(window.location.search);
   const idPaciente = params.get("idPaciente");
 
   if (!idPaciente) {
-    alert("No se especificó el paciente");
+    await window.sigmegAlert("No se especificó el paciente", "warning");
     window.history.back();
     return;
   }
@@ -157,7 +157,7 @@ async function guardarTriaje(e) {
     console.log("📥 Respuesta:", result); // ✅ Agregar log
 
     if (result.success) {
-      alert("✅ Triaje registrado correctamente");
+      await window.sigmegAlert("Triaje registrado correctamente", "success");
       window.location.href = "/triaje/listado"; // ✅ Mejor que history.back()
     } else {
       alert("❌ " + (result.message || "Error al registrar el triaje"));
@@ -205,8 +205,9 @@ function validarFormulario() {
 }
 
 // Cancelar
-function cancelarTriaje() {
-  if (confirm("¿Estás seguro de que deseas cancelar?")) {
+async function cancelarTriaje() {
+  const confirmado = await window.sigmegConfirm("¿Estás seguro de que deseas cancelar?");
+  if (confirmado) {
     window.history.back();
   }
 }

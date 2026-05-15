@@ -58,6 +58,8 @@ namespace SGMG.Controllers
     [HttpGet]
     public IActionResult Create()
     {
+      TempData.Remove("Success");
+      TempData.Remove("SuccessMessage");
       var model = new HistoriaClinicaCompletaRequestDTO();
       return View(model);
     }
@@ -116,8 +118,8 @@ namespace SGMG.Controllers
           await _domicilioPacienteRepository.AddDomicilioAsync(domicilio);
         }
 
-        TempData["Success"] = "Historia clínica registrada exitosamente.";
-        return RedirectToAction("paciente", "Home");
+        TempData["SuccessMessage"] = "Historia clínica registrada exitosamente.";
+        return RedirectToAction("Paciente", "Home");
       }
       catch (Exception ex)
       {
@@ -134,8 +136,8 @@ namespace SGMG.Controllers
         var paciente = await _pacienteRepository.GetPacienteByIdAsync(id);
         if (paciente == null)
         {
-          TempData["Error"] = "Paciente no encontrado.";
-          return RedirectToAction("Index", "Paciente");
+          TempData["ErrorMessage"] = "Paciente no encontrado.";
+          return RedirectToAction("Paciente", "Home");
         }
 
         var historiaClinica = await _historiaClinicaRepository.GetHistoriaClinicaByPacienteIdAsync(id);
@@ -179,8 +181,8 @@ namespace SGMG.Controllers
       }
       catch (Exception ex)
       {
-        TempData["Error"] = $"Error al cargar la historia clínica: {ex.Message}";
-        return RedirectToAction("Index", "Paciente");
+        TempData["ErrorMessage"] = $"Error al cargar la historia clínica: {ex.Message}";
+        return RedirectToAction("Paciente", "Home");
       }
     }
 
@@ -198,8 +200,8 @@ namespace SGMG.Controllers
         var paciente = await _pacienteRepository.GetPacienteByIdAsync(model.Paciente.IdPaciente);
         if (paciente == null)
         {
-          TempData["Error"] = "Paciente no encontrado.";
-          return RedirectToAction("Index", "Paciente");
+          TempData["ErrorMessage"] = "Paciente no encontrado.";
+          return RedirectToAction("Paciente", "Home");
         }
 
         paciente.NumeroDocumento = model.Paciente.NumeroDocumento ?? string.Empty;
@@ -272,8 +274,8 @@ namespace SGMG.Controllers
           }
         }
 
-        TempData["Success"] = "Historia clínica actualizada exitosamente.";
-        return RedirectToAction("Index", "Paciente");
+        TempData["SuccessMessage"] = "Historia clínica actualizada exitosamente.";
+        return RedirectToAction("Paciente", "Home");
       }
       catch (Exception ex)
       {

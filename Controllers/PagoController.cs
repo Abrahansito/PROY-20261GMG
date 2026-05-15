@@ -120,18 +120,18 @@ namespace SGMG.Controllers
 
               _logger.LogInformation($"✅ Pago ID={pagoExistente.IdPago} actualizado a Pagado exitosamente");
               _logger.LogInformation($"✅ Estado de cita actualizado a: {cita.EstadoCita}");
-              TempData["Success"] = "Pago procesado exitosamente";
+              TempData["PagoSuccess"] = "Pago procesado exitosamente";
             }
             else
             {
               _logger.LogError($"❌ Error al actualizar el pago ID={pagoExistente.IdPago}");
-              TempData["Error"] = "Error al procesar el pago";
+              TempData["PagoError"] = "Error al procesar el pago";
             }
           }
           else
           {
             _logger.LogInformation($"El pago ya está en estado: {pagoExistente.EstadoPago}");
-            TempData["Info"] = $"El pago ya está {pagoExistente.EstadoPago}";
+            TempData["PagoInfo"] = $"El pago ya está {pagoExistente.EstadoPago}";
           }
         }
         else
@@ -165,12 +165,12 @@ namespace SGMG.Controllers
           {
             _logger.LogInformation($"✅ Nuevo pago creado exitosamente: ID={nuevoPago.IdPago}, Total={nuevoPago.Total}");
             _logger.LogInformation($"✅ Estado de cita actualizado a: {cita.EstadoCita}");
-            TempData["Success"] = "Pago creado y procesado exitosamente";
+            TempData["PagoSuccess"] = "Pago creado y procesado exitosamente";
           }
           else
           {
             _logger.LogError($"❌ Error al crear el pago para la Cita ID={id}");
-            TempData["Error"] = "No se pudo crear el pago";
+            TempData["PagoError"] = "No se pudo crear el pago";
           }
         }
 
@@ -181,7 +181,7 @@ namespace SGMG.Controllers
       {
         _logger.LogError($"❌ Excepción en Pagar: {ex.Message}");
         _logger.LogError($"StackTrace: {ex.StackTrace}");
-        TempData["Error"] = "Ocurrió un error al procesar el pago";
+        TempData["PagoError"] = "Ocurrió un error al procesar el pago";
         return RedirectToAction("Resumen", new { id });
       }
     }

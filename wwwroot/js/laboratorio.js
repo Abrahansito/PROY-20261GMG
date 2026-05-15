@@ -249,7 +249,8 @@ function crearNuevaOrden() {
 
 // Función para cancelar una orden
 async function cancelarOrden(idOrden, index) {
-  if (!confirm("¿Está seguro que desea cancelar esta orden?")) {
+  const confirmado = await window.sigmegConfirm("¿Está seguro que desea cancelar esta orden?");
+  if (!confirmado) {
     return;
   }
 
@@ -291,11 +292,9 @@ function subirDetalles(idOrden, index) {
 
 // Funciones de utilidad para mostrar mensajes
 function showSuccess(message) {
-  // Implementar según tu sistema de notificaciones
-  alert(message);
+  window.sigmegAlert(message, "success");
 }
 
 function showError(message) {
-  // Implementar según tu sistema de notificaciones
-  alert(message);
+  window.sigmegAlert(message, "error");
 }

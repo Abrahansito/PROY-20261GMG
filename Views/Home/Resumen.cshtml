@@ -2,11 +2,38 @@
 @{
     ViewData["Title"] = "Resumen de Pago";
     Layout = "~/Views/Shared/_LayoutA.cshtml";
+    var pagoSuccess = TempData["PagoSuccess"] as string;
+    var pagoError = TempData["PagoError"] as string;
+    var pagoInfo = TempData["PagoInfo"] as string;
 }
 
 
 <div class="container mt-4 resumen-page">
     <center><h2> <b style="color: rgb(134, 134, 185)">Resumen de Pago</b> </h2></center>
+
+    @if (!string.IsNullOrWhiteSpace(pagoSuccess))
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-3" role="alert" style="border-left: 5px solid #28a745;">
+            <strong>Pago realizado.</strong> @pagoSuccess
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(pagoError))
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert" style="border-left: 5px solid #dc3545;">
+            <strong>No se pudo procesar el pago.</strong> @pagoError
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(pagoInfo))
+    {
+        <div class="alert alert-info alert-dismissible fade show mb-3" role="alert" style="border-left: 5px solid #0dcaf0;">
+            @pagoInfo
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
     
     <div class="card mb-3">
         <div class="card-header text-white" style="background-color: rgb(134, 134, 185)"> <b>👤 Información del Paciente</b> </div>

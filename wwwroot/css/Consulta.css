@@ -172,6 +172,136 @@
             cursor: not-allowed;
         }
 
+        .consulta-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.58);
+            padding: 24px;
+        }
+
+        .consulta-modal-overlay.consulta-modal-active {
+            display: flex;
+        }
+
+        .consulta-modal {
+            width: min(520px, 100%);
+            overflow: hidden;
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+            animation: consultaModalIn 0.18s ease-out;
+        }
+
+        .consulta-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 24px 26px;
+            color: #ffffff;
+            background: #2563eb;
+        }
+
+        .consulta-modal-header.success {
+            background: #16a34a;
+        }
+
+        .consulta-modal-header.warning {
+            background: #f59e0b;
+        }
+
+        .consulta-modal-header.error {
+            background: #dc2626;
+        }
+
+        .consulta-modal-header.info {
+            background: #2563eb;
+        }
+
+        .consulta-modal-icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.22);
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .consulta-modal-header h2 {
+            margin: 0;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .consulta-modal-body {
+            padding: 28px 26px 18px;
+        }
+
+        .consulta-modal-body p {
+            margin: 0;
+            color: #374151;
+            font-size: 16px;
+            line-height: 1.55;
+        }
+
+        .consulta-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 0 26px 26px;
+        }
+
+        .consulta-modal-btn {
+            min-width: 112px;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 22px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .consulta-modal-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .consulta-modal-btn-primary {
+            color: #ffffff;
+            background: #2563eb;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+        }
+
+        .consulta-modal-btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .consulta-modal-btn-secondary {
+            color: #ffffff;
+            background: #6b7280;
+        }
+
+        .consulta-modal-btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        @keyframes consultaModalIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         /* Campos opcionales info */
         .optional-text {
             font-size: 12px;

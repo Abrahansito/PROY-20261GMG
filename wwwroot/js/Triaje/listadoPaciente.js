@@ -238,7 +238,7 @@ async function guardarTriaje(event) {
     console.log("Respuesta:", result);
 
     if (result.success) {
-      alert("Triaje registrado exitosamente");
+      await window.sigmegAlert("Triaje registrado exitosamente", "success");
       window.location.href = "/triaje/listado";
     } else {
       alert("Error: " + result.message);

@@ -80,8 +80,16 @@
             color: white;
         }
         .hc-text-danger {
+            color: #dc3545 !important;
+            display: block;
             font-size: 0.875rem;
+            font-weight: 500;
             margin-top: 5px;
+        }
+        .hc-form-container .field-validation-error,
+        .hc-form-container .validation-summary-errors,
+        .hc-form-container .text-danger {
+            color: #dc3545 !important;
         }
         .hc-collapse-icon {
             float: right;
@@ -134,18 +142,14 @@
     <div class="container py-5">
         <h2 class="hc-main-title">@ViewData["Title"]</h2>
 
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert hc-alert-success alert-dismissible fade show" role="alert">
-                @TempData["Success"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
+    @{
+        var errorMessage = TempData["Error"] as string;
+    }
 
-        @if (TempData["Error"] != null)
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
         {
             <div class="alert hc-alert-danger alert-dismissible fade show" role="alert">
-                @TempData["Error"]
+                @errorMessage
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
@@ -169,8 +173,8 @@
             @Html.HiddenFor(m => m.HistoriaClinica.IdHistoria)
             @Html.HiddenFor(m => m.HistoriaClinica.IdPaciente)
             @Html.HiddenFor(m => m.HistoriaClinica.CodigoHistoria)
-            @Html.HiddenFor(m => m.Domicilio.IdDomicilio)
-            @Html.HiddenFor(m => m.Domicilio.IdPaciente)
+            @Html.Hidden("Domicilio.IdDomicilio", Model.Domicilio?.IdDomicilio ?? 0)
+            @Html.Hidden("Domicilio.IdPaciente", Model.Domicilio?.IdPaciente ?? 0)
 
             <!-- Información Personal -->
             <div class="card hc-card">
@@ -296,7 +300,7 @@
                 <button type="submit" class="btn hc-btn-primary me-2">
                     <span>@(Model.EsEdicion ? "Actualizar Registro" : "Registrar Paciente")</span>
                 </button>
-                <a asp-controller="Paciente" asp-action="Index" class="btn hc-btn-secondary">Cancelar</a>
+                <a asp-controller="Home" asp-action="Paciente" class="btn hc-btn-secondary">Cancelar</a>
             </div>
         </form>
     </div>

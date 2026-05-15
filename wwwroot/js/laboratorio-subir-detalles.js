@@ -373,12 +373,11 @@ function cerrarModalSuccess() {
   window.location.href = construirUrlLaboratorio();
 }
 
-function volver() {
-  if (
-    confirm(
-      "¿Está seguro de que desea salir? Los datos no guardados se perderán."
-    )
-  ) {
+async function volver() {
+  const confirmado = await window.sigmegConfirm(
+    "¿Está seguro de que desea salir? Los datos no guardados se perderán."
+  );
+  if (confirmado) {
     window.location.href = construirUrlLaboratorio();
   }
 }

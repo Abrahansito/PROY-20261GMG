@@ -15,7 +15,7 @@ async function cargarDatosTriaje() {
     const idPaciente = params.get("idPaciente");
     
     if (!idTriaje || !idPaciente) {
-        alert("No se especificaron los datos necesarios");
+        await window.sigmegAlert("No se especificaron los datos necesarios", "warning");
         window.history.back();
         return;
     }
@@ -154,7 +154,7 @@ async function actualizarTriaje(e) {
         const result = await res.json();
 
         if (result.success) {
-            alert("Triaje actualizado correctamente");
+            await window.sigmegAlert("Triaje actualizado correctamente", "success");
             window.location.href = "/triaje/listado";
         } else {
             alert(result.message || "Error al actualizar el triaje");
@@ -166,8 +166,9 @@ async function actualizarTriaje(e) {
 }
 
 // Cancelar edición
-function cancelarEdicion() {
-    if (confirm("¿Estás seguro de que deseas cancelar? Los cambios no guardados se perderán.")) {
+async function cancelarEdicion() {
+    const confirmado = await window.sigmegConfirm("¿Estás seguro de que deseas cancelar? Los cambios no guardados se perderán.");
+    if (confirmado) {
         window.location.href = "/triaje/listado";
     }
 }

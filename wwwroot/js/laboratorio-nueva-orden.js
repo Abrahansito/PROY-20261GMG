@@ -113,10 +113,9 @@ async function guardarOrden(event) {
     const result = await res.json();
 
     if (result.success) {
-      showSuccess("Orden de laboratorio creada exitosamente");
-      setTimeout(() => {
+      showSuccess("Orden de laboratorio creada exitosamente", function () {
         window.location.href = construirUrlLaboratorio();
-      }, 1500);
+      });
     } else {
       showError(
         result.message ||
@@ -131,12 +130,11 @@ async function guardarOrden(event) {
   }
 }
 
-function volver() {
-  if (
-    confirm(
-      "¿Está seguro de que desea salir? Los datos no guardados se perderán."
-    )
-  ) {
+async function volver() {
+  const confirmado = await window.sigmegConfirm(
+    "¿Está seguro de que desea salir? Los datos no guardados se perderán."
+  );
+  if (confirmado) {
     window.location.href = construirUrlLaboratorio();
   }
 }
@@ -150,8 +148,8 @@ function construirUrlLaboratorio() {
 }
 
 // Funciones de utilidad para mostrar mensajes
-function showSuccess(message) {
-  mostrarModal(message, "success");
+function showSuccess(message, onAccept) {
+  mostrarModal(message, "success", onAccept);
 }
 
 function showError(message) {
@@ -162,7 +160,7 @@ function showWarning(message) {
   mostrarModal(message, "warning");
 }
 
-function mostrarModal(message, type) {
+function mostrarModal(message, type, onAccept) {
   // Crear el overlay del modal
   const modalOverlay = document.createElement("div");
   modalOverlay.className = "modal-overlay";
@@ -219,7 +217,7 @@ function mostrarModal(message, type) {
         <p style="margin: 0 0 25px 0; color: #6b7280; font-size: 15px; line-height: 1.6;">
             ${message}
         </p>
-        <button onclick="cerrarModal()" style="
+        <button id="labOrderModalAccept" style="
             background: ${buttonColor};
             color: white;
             border: none;
@@ -260,6 +258,10 @@ function mostrarModal(message, type) {
   modalOverlay.appendChild(modal);
   document.body.appendChild(modalOverlay);
 
+  document.getElementById("labOrderModalAccept").addEventListener("click", function () {
+    cerrarModal(onAccept);
+  });
+
   // Cerrar al hacer clic en el overlay
   modalOverlay.addEventListener("click", function (e) {
     if (e.target === modalOverlay) {
@@ -268,10 +270,66 @@ function mostrarModal(message, type) {
   });
 }
 
-function cerrarModal() {
+function cerrarModal(callback) {
   const modal = document.querySelector(".modal-overlay");
   if (modal) {
     modal.style.animation = "fadeIn 0.3s ease reverse";
-    setTimeout(() => modal.remove(), 300);
+    setTimeout(() => {
+      modal.remove();
+      if (typeof callback === "function") callback();
+    }, 300);
   }
 }
+
+function mostrarConfirmacion(message, onConfirm) {
+  mostrarModal(message, "warning");
+
+  const modal = document.querySelector(".modal-message");
+  if (!modal) return;
+
+  modal.querySelector("h3").textContent = "Confirmar salida";
+  const footerButton = document.getElementById("labOrderModalAccept");
+  footerButton.remove();
+
+  const actions = document.createElement("div");
+  actions.style.cssText = "display: flex; justify-content: center; gap: 12px;";
+  actions.innerHTML = `
+    <button type="button" id="labOrderModalCancel" style="
+      background: #6b7280;
+      color: white;
+      border: none;
+      padding: 12px 26px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+    ">Cancelar</button>
+    <button type="button" id="labOrderModalConfirm" style="
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 12px 26px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+    ">Aceptar</button>
+  `;
+
+  modal.appendChild(actions);
+  document.getElementById("labOrderModalCancel").addEventListener("click", function () {
+    cerrarModal();
+  });
+  document.getElementById("labOrderModalConfirm").addEventListener("click", function () {
+    cerrarModal(onConfirm);
+  });
+}
+
+volver = function () {
+  mostrarConfirmacion(
+    "¿Está seguro de que desea salir? Los datos no guardados se perderán.",
+    function () {
+      window.location.href = construirUrlLaboratorio();
+    }
+  );
+};

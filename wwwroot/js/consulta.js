@@ -231,9 +231,9 @@ async function cargarDatosConsulta() {
 
 // Volver
 function volver() {
-    if (confirm('¿Está seguro de que desea salir? Los datos no guardados se perderán.')) {
+    mostrarConfirmacionConsulta('¿Está seguro de que desea salir? Los datos no guardados se perderán.', function () {
         window.location.href = construirUrlHistoriaClinica();
-    }
+    });
 }
 
 function construirUrlHistoriaClinica() {
@@ -349,11 +349,12 @@ async function guardarConsultaEnServidor(mensajeExito, redirigir) {
             idCitaActual = consulta.idCita || consulta.IdCita || idCitaActual;
         }
 
-        showSuccess(mensajeExito);
         if (redirigir) {
-            setTimeout(() => {
+            showSuccess(mensajeExito, function () {
                 window.location.href = construirUrlHistoriaClinica();
-            }, 1200);
+            });
+        } else {
+            showSuccess(mensajeExito);
         }
 
         return true;
@@ -364,22 +365,101 @@ async function guardarConsultaEnServidor(mensajeExito, redirigir) {
     }
 }
 
-function showAlert(message) {
-    mostrarMensajeConsulta(message);
+function showAlert(message, type = 'info') {
+    mostrarMensajeConsulta(message, type);
 }
 
-function showSuccess(message) {
-    mostrarMensajeConsulta(message);
+function showSuccess(message, onAccept = null) {
+    mostrarMensajeConsulta(message, 'success', onAccept);
 }
 
 function showError(message) {
-    mostrarMensajeConsulta(message);
+    mostrarMensajeConsulta(message, 'error');
 }
 
 function showInfo(message) {
-    mostrarMensajeConsulta(message);
+    mostrarMensajeConsulta(message, 'info');
 }
 
-function mostrarMensajeConsulta(message) {
-    alert(message);
+function mostrarMensajeConsulta(message, type = 'info', onAccept = null) {
+    cerrarModalConsulta();
+
+    const config = {
+        success: { title: 'Operación exitosa', icon: '✓', className: 'success' },
+        warning: { title: 'Campos pendientes', icon: '!', className: 'warning' },
+        error: { title: 'No se pudo completar', icon: '!', className: 'error' },
+        info: { title: 'Información', icon: 'i', className: 'info' }
+    };
+
+    const current = config[type] || config.info;
+    const overlay = document.createElement('div');
+    overlay.className = 'consulta-modal-overlay consulta-modal-active';
+    overlay.innerHTML = `
+        <div class="consulta-modal">
+            <div class="consulta-modal-header ${current.className}">
+                <div class="consulta-modal-icon">${current.icon}</div>
+                <h2>${current.title}</h2>
+            </div>
+            <div class="consulta-modal-body">
+                <p>${message}</p>
+            </div>
+            <div class="consulta-modal-footer">
+                <button type="button" class="consulta-modal-btn consulta-modal-btn-primary" id="consultaModalAccept">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    const acceptButton = document.getElementById('consultaModalAccept');
+    acceptButton.focus();
+    acceptButton.addEventListener('click', function () {
+        cerrarModalConsulta();
+        if (typeof onAccept === 'function') onAccept();
+    });
 }
+
+function mostrarConfirmacionConsulta(message, onConfirm) {
+    cerrarModalConsulta();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'consulta-modal-overlay consulta-modal-active';
+    overlay.innerHTML = `
+        <div class="consulta-modal">
+            <div class="consulta-modal-header warning">
+                <div class="consulta-modal-icon">?</div>
+                <h2>Confirmar salida</h2>
+            </div>
+            <div class="consulta-modal-body">
+                <p>${message}</p>
+            </div>
+            <div class="consulta-modal-footer">
+                <button type="button" class="consulta-modal-btn consulta-modal-btn-secondary" id="consultaModalCancel">
+                    Cancelar
+                </button>
+                <button type="button" class="consulta-modal-btn consulta-modal-btn-primary" id="consultaModalConfirm">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    document.getElementById('consultaModalCancel').addEventListener('click', cerrarModalConsulta);
+    document.getElementById('consultaModalConfirm').addEventListener('click', function () {
+        cerrarModalConsulta();
+        if (typeof onConfirm === 'function') onConfirm();
+    });
+}
+
+function cerrarModalConsulta() {
+    const modal = document.querySelector('.consulta-modal-overlay');
+    if (modal) modal.remove();
+}
+
+volver = function () {
+    mostrarConfirmacionConsulta('¿Está seguro de que desea salir? Los datos no guardados se perderán.', function () {
+        window.location.href = construirUrlHistoriaClinica();
+    });
+};

@@ -1112,7 +1112,24 @@ function calConfirmarCita() {
       
       calCerrarModal();
       
-      if (esReprogramacion && data.data) {
+      if (!esReprogramacion) {
+        setTimeout(() => {
+          const slotBloqueado = calActualizarSlotVisual(
+            calDatosModal.fecha,
+            calDatosModal.hora,
+            true
+          );
+
+          if (!slotBloqueado) {
+            calCargarCalendario();
+          }
+        }, 100);
+
+        btnConfirmar.disabled = false;
+        btnConfirmar.textContent = textoOriginal;
+        btnConfirmar.style.opacity = '1';
+        btnConfirmar.style.cursor = 'pointer';
+      } else if (data.data) {
         console.log('📅 Actualizando calendario visualmente...');
         console.log('   → Datos recibidos:', data.data);
         console.log('   → Horario anterior:', data.data.fechaAnterior, data.data.horaAnterior);
