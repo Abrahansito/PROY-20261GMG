@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using SGMG.Data;
 using SGMG.Dtos.Response;
 using SGMG.Models;
 using SGMG.Repository;
@@ -16,10 +18,12 @@ namespace SGMG.Services.ServiceImpl
   public class PacienteService : IPacienteService
   {
     private readonly IPacienteRepository _pacienteRepository;
+    private readonly ApplicationDbContext _context;
 
-    public PacienteService(IPacienteRepository pacienteRepository)
+    public PacienteService(IPacienteRepository pacienteRepository, ApplicationDbContext context)
     {
       _pacienteRepository = pacienteRepository;
+      _context = context;
     }
 
     public async Task<GenericResponse<IEnumerable<Paciente>>> GetAllPacientesAsync()
@@ -50,6 +54,8 @@ namespace SGMG.Services.ServiceImpl
 
         if (paciente == null)
           return new GenericResponse<Paciente>(false, "No se encontró ningún paciente con ese documento.");
+
+        await CompletarEdadDesdeHistoriaClinicaAsync(paciente);
 
         return new GenericResponse<Paciente>(true, paciente, "Paciente encontrado correctamente.");
       }
@@ -105,6 +111,8 @@ namespace SGMG.Services.ServiceImpl
         var paciente = await _pacienteRepository.GetPacienteByIdAsync(id);
         if (paciente == null)
           return new GenericResponse<Paciente>(false, "Paciente no encontrado.");
+
+        await CompletarEdadDesdeHistoriaClinicaAsync(paciente);
 
         return new GenericResponse<Paciente>(true, paciente, "Paciente obtenido correctamente.");
       }
@@ -211,12 +219,14 @@ namespace SGMG.Services.ServiceImpl
     {
       return new Paciente
       {
+        IdPaciente = dto.IdPaciente,
         NumeroDocumento = dto.NumeroDocumento ?? string.Empty,
         TipoDocumento = dto.TipoDocumento ?? string.Empty,
         Nombre = dto.Nombre ?? string.Empty,
         ApellidoPaterno = dto.ApellidoPaterno ?? string.Empty,
         ApellidoMaterno = dto.ApellidoMaterno ?? string.Empty,
         Sexo = dto.Sexo ?? string.Empty,
+        Edad = dto.Edad,
         FechaRegistro = DateTime.UtcNow // al crear, se asigna la fecha actual
       };
     }
@@ -229,8 +239,35 @@ namespace SGMG.Services.ServiceImpl
         Nombre = string.IsNullOrEmpty(paciente.Nombre) ? null : paciente.Nombre,
         ApellidoPaterno = string.IsNullOrEmpty(paciente.ApellidoPaterno) ? null : paciente.ApellidoPaterno,
         ApellidoMaterno = string.IsNullOrEmpty(paciente.ApellidoMaterno) ? null : paciente.ApellidoMaterno,
-        Sexo = string.IsNullOrEmpty(paciente.Sexo) ? null : paciente.Sexo
+        Sexo = string.IsNullOrEmpty(paciente.Sexo) ? null : paciente.Sexo,
+        Edad = paciente.Edad
       };
+    }
+
+    private async Task CompletarEdadDesdeHistoriaClinicaAsync(Paciente paciente)
+    {
+      if (paciente.Edad > 0)
+        return;
+
+      var fechaNacimiento = await _context.HistoriasClinicas
+        .Where(h => h.IdPaciente == paciente.IdPaciente)
+        .OrderByDescending(h => h.IdHistoria)
+        .Select(h => (DateTime?)h.FechaNacimiento)
+        .FirstOrDefaultAsync();
+
+      if (fechaNacimiento.HasValue)
+        paciente.Edad = CalcularEdad(fechaNacimiento.Value);
+    }
+
+    private static int CalcularEdad(DateTime fechaNacimiento)
+    {
+      var hoy = DateTime.Today;
+      var edad = hoy.Year - fechaNacimiento.Year;
+
+      if (fechaNacimiento.Date > hoy.AddYears(-edad))
+        edad--;
+
+      return Math.Max(edad, 0);
     }
   }
 }

@@ -85,7 +85,7 @@ namespace SGMG.Services.ServiceImpl
                         cita.Paciente.Nombre
                       }.Where(s => !string.IsNullOrWhiteSpace(s)))
                   : string.Empty,
-              Edad = cita.Paciente?.Edad ?? 0,
+              Edad = ObtenerEdadPaciente(cita.Paciente),
               Telefono = string.Empty,
               HistoriaClinicaCodigo = cita.Paciente?.HistoriasClinicas?.FirstOrDefault()?.CodigoHistoria ?? string.Empty,
               TipoSeguro = cita.Paciente?.HistoriasClinicas?.FirstOrDefault()?.TipoSeguro ?? string.Empty,
@@ -165,6 +165,7 @@ namespace SGMG.Services.ServiceImpl
         Nombres = cita?.Paciente != null
               ? string.Join(" ", new[] { cita.Paciente.ApellidoPaterno, cita.Paciente.ApellidoMaterno, cita.Paciente.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)))
               : string.Empty,
+        Edad = ObtenerEdadPaciente(cita?.Paciente),
         Medico = cita?.Medico != null
               ? string.Join(" ", new[] { cita.Medico.ApellidoPaterno, cita.Medico.ApellidoMaterno, cita.Medico.Nombre }.Where(s => !string.IsNullOrWhiteSpace(s)))
               : string.Empty,
@@ -240,7 +241,7 @@ namespace SGMG.Services.ServiceImpl
                 cita.Paciente.Nombre
               }.Where(s => !string.IsNullOrWhiteSpace(s)))
               : string.Empty,
-        Edad = cita.Paciente?.Edad ?? 0,
+        Edad = ObtenerEdadPaciente(cita.Paciente),
         Telefono = string.Empty,
         HistoriaClinicaCodigo = cita.Paciente?.HistoriasClinicas?.FirstOrDefault()?.CodigoHistoria ?? string.Empty,
         TipoSeguro = cita.Paciente?.HistoriasClinicas?.FirstOrDefault()?.TipoSeguro ?? string.Empty,
@@ -290,6 +291,33 @@ namespace SGMG.Services.ServiceImpl
       _logger.LogInformation("=== FIN GetResumenByCitaId ===");
 
       return dto;
+    }
+
+    private static int ObtenerEdadPaciente(Paciente? paciente)
+    {
+      if (paciente == null)
+        return 0;
+
+      if (paciente.Edad > 0)
+        return paciente.Edad;
+
+      var fechaNacimiento = paciente.HistoriasClinicas?
+          .OrderByDescending(h => h.IdHistoria)
+          .Select(h => (DateTime?)h.FechaNacimiento)
+          .FirstOrDefault();
+
+      return fechaNacimiento.HasValue ? CalcularEdad(fechaNacimiento.Value) : 0;
+    }
+
+    private static int CalcularEdad(DateTime fechaNacimiento)
+    {
+      var hoy = DateTime.Today;
+      var edad = hoy.Year - fechaNacimiento.Year;
+
+      if (fechaNacimiento.Date > hoy.AddYears(-edad))
+        edad--;
+
+      return Math.Max(edad, 0);
     }
 
   }

@@ -184,11 +184,11 @@
         </div>
         <div class="derivacion-info-item">
             <div class="derivacion-info-label">Edad</div>
-            <div class="derivacion-info-value">@paciente?.Edad años</div>
+            <div class="derivacion-info-value">@ViewBag.EdadPaciente años</div>
         </div>
         <div class="derivacion-info-item">
             <div class="derivacion-info-label">Seguro</div>
-            <div class="derivacion-info-value">SIS - Sistema Integral de Salud</div>
+            <div class="derivacion-info-value">@ViewBag.SeguroPaciente</div>
         </div>
     </div>
 
@@ -219,7 +219,7 @@
                             <td>@derivacion.FechaDerivacion.ToString("dd/MM/yyyy")</td>
                             <td>
                                 <button class="derivacion-btn-detalle" onclick="toggleDetalle(@derivacion.IdDerivacion)" id="btn-@derivacion.IdDerivacion">
-                                    Ocultar detalles
+                                    Ver detalles
                                 </button>
                             </td>
                         </tr>

@@ -1,6 +1,7 @@
 const API_BASE_URL = "http://localhost:5122";
 let idPacienteActual = null;
 let idMedicoActual = null;
+let idCitaActual = null;
 let idConsultaActual = null;
 
 // Datos temporales de las pestañas
@@ -29,6 +30,7 @@ function obtenerParametrosURL() {
     const params = new URLSearchParams(window.location.search);
     idPacienteActual = params.get('idPaciente');
     idMedicoActual = params.get('idMedico');
+    idCitaActual = params.get('idCita');
     idConsultaActual = params.get('idConsulta'); // Para edición
     
     if (!idPacienteActual) {
@@ -82,7 +84,7 @@ function restaurarDatosTab(tab) {
 }
 
 // Guardar Síntomas
-function guardarSintomas() {
+async function guardarSintomas() {
     const motivoConsulta = document.getElementById('motivoConsulta').value.trim();
     const sintomasPresentados = document.getElementById('sintomasPresentados').value.trim();
     
@@ -155,8 +157,8 @@ async function enviarConsultaCompleta() {
         const consultaDTO = {
             idConsulta: idConsultaActual || 0,
             idPaciente: parseInt(idPacienteActual),
-            idMedico: parseInt(idMedicoActual || 1), // TODO: Obtener del contexto
-            idCita: null,
+            idMedico: idMedicoActual ? parseInt(idMedicoActual) : null,
+            idCita: idCitaActual ? parseInt(idCitaActual) : null,
             motivoConsulta: datosConsulta.motivoConsulta,
             sintomasPresentados: datosConsulta.sintomasPresentados,
             diagnosticoPrincipal: datosConsulta.diagnosticoPrincipal,
@@ -185,7 +187,7 @@ async function enviarConsultaCompleta() {
         if (result.success) {
             showSuccess('Consulta registrada exitosamente');
             setTimeout(() => {
-                window.location.href = `/historia-clinica/ver?idPaciente=${idPacienteActual}`;
+                window.location.href = construirUrlHistoriaClinica();
             }, 2000);
         } else {
             showError(result.message || 'Error al guardar la consulta');
@@ -230,6 +232,154 @@ async function cargarDatosConsulta() {
 // Volver
 function volver() {
     if (confirm('¿Está seguro de que desea salir? Los datos no guardados se perderán.')) {
-        window.location.href = `/historia-clinico/ver?idPaciente=${idPacienteActual}`;
+        window.location.href = construirUrlHistoriaClinica();
     }
+}
+
+function construirUrlHistoriaClinica() {
+    const params = new URLSearchParams();
+    if (idPacienteActual) params.set('idPaciente', idPacienteActual);
+    if (idCitaActual) params.set('idCita', idCitaActual);
+    if (idMedicoActual) params.set('idMedico', idMedicoActual);
+    return `/historia-clinica/ver?${params.toString()}`;
+}
+
+async function guardarSintomas() {
+    const motivoConsulta = document.getElementById('motivoConsulta').value.trim();
+    const sintomasPresentados = document.getElementById('sintomasPresentados').value.trim();
+
+    if (!motivoConsulta || !sintomasPresentados) {
+        showAlert('Por favor complete todos los campos obligatorios', 'warning');
+        return;
+    }
+
+    datosConsulta.motivoConsulta = motivoConsulta;
+    datosConsulta.sintomasPresentados = sintomasPresentados;
+
+    const guardado = await guardarConsultaEnServidor('Sintomas guardados. Puede continuar con el diagnostico.', false);
+    if (guardado) setTimeout(() => cambiarTab('diagnostico'), 700);
+}
+
+async function guardarDiagnostico() {
+    const diagnosticoPrincipal = document.getElementById('diagnosticoPrincipal').value.trim();
+    const observaciones = document.getElementById('observaciones').value.trim();
+
+    if (!datosConsulta.motivoConsulta || !datosConsulta.sintomasPresentados) {
+        showAlert('Primero debe guardar los sintomas del paciente', 'warning');
+        cambiarTab('sintomas');
+        return;
+    }
+
+    if (!diagnosticoPrincipal || !observaciones) {
+        showAlert('Por favor complete todos los campos obligatorios', 'warning');
+        return;
+    }
+
+    datosConsulta.diagnosticoPrincipal = diagnosticoPrincipal;
+    datosConsulta.codigoCie10 = document.getElementById('codigoCie10').value.trim();
+    datosConsulta.observaciones = observaciones;
+
+    const guardado = await guardarConsultaEnServidor('Diagnostico guardado. Puede continuar con la evolucion.', false);
+    if (guardado) setTimeout(() => cambiarTab('evolucion'), 700);
+}
+
+async function guardarEvolucion() {
+    const descripcionEvolucion = document.getElementById('descripcionEvolucion').value.trim();
+
+    if (!descripcionEvolucion) {
+        showAlert('Por favor complete la descripcion de la evolucion', 'warning');
+        return;
+    }
+
+    datosConsulta.descripcionEvolucion = descripcionEvolucion;
+    datosConsulta.indicacionesRecomendaciones = document.getElementById('indicacionesRecomendaciones').value.trim();
+
+    if (!datosConsulta.motivoConsulta || !datosConsulta.sintomasPresentados) {
+        showAlert('Por favor complete la pestaña de Sintomas primero', 'warning');
+        cambiarTab('sintomas');
+        return;
+    }
+
+    if (!datosConsulta.diagnosticoPrincipal || !datosConsulta.observaciones) {
+        showAlert('Por favor complete la pestaña de Diagnostico primero', 'warning');
+        cambiarTab('diagnostico');
+        return;
+    }
+
+    await guardarConsultaEnServidor('Consulta registrada exitosamente', true);
+}
+
+async function guardarConsultaEnServidor(mensajeExito, redirigir) {
+    try {
+        const consultaDTO = {
+            idConsulta: idConsultaActual ? parseInt(idConsultaActual) : 0,
+            idPaciente: parseInt(idPacienteActual),
+            idMedico: idMedicoActual ? parseInt(idMedicoActual) : 0,
+            idCita: idCitaActual ? parseInt(idCitaActual) : null,
+            motivoConsulta: datosConsulta.motivoConsulta,
+            sintomasPresentados: datosConsulta.sintomasPresentados,
+            diagnosticoPrincipal: datosConsulta.diagnosticoPrincipal,
+            codigoCie10: datosConsulta.codigoCie10,
+            observaciones: datosConsulta.observaciones,
+            descripcionEvolucion: datosConsulta.descripcionEvolucion,
+            indicacionesRecomendaciones: datosConsulta.indicacionesRecomendaciones
+        };
+
+        const endpoint = idConsultaActual
+            ? `${API_BASE_URL}/api/consulta/actualizar`
+            : `${API_BASE_URL}/api/consulta/registrar`;
+
+        const method = idConsultaActual ? 'PUT' : 'POST';
+        const res = await fetch(endpoint, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(consultaDTO)
+        });
+
+        const result = await res.json();
+        if (!result.success) {
+            showError(result.message || 'Error al guardar la consulta');
+            return false;
+        }
+
+        const consulta = result.data || result.Data;
+        if (consulta) {
+            idConsultaActual = consulta.idConsulta || consulta.IdConsulta || idConsultaActual;
+            idMedicoActual = consulta.idMedico || consulta.IdMedico || idMedicoActual;
+            idCitaActual = consulta.idCita || consulta.IdCita || idCitaActual;
+        }
+
+        showSuccess(mensajeExito);
+        if (redirigir) {
+            setTimeout(() => {
+                window.location.href = construirUrlHistoriaClinica();
+            }, 1200);
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Error:', error);
+        showError('Error al conectar con el servidor');
+        return false;
+    }
+}
+
+function showAlert(message) {
+    mostrarMensajeConsulta(message);
+}
+
+function showSuccess(message) {
+    mostrarMensajeConsulta(message);
+}
+
+function showError(message) {
+    mostrarMensajeConsulta(message);
+}
+
+function showInfo(message) {
+    mostrarMensajeConsulta(message);
+}
+
+function mostrarMensajeConsulta(message) {
+    alert(message);
 }

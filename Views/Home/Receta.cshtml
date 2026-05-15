@@ -102,10 +102,10 @@
             <div class="form-section"> <h2 class="section-title-receta">Observaciones Generales</h2> <div class="form-row"> <div class="form-group-receta full-width"> <textarea id="observacionesGenerales" class="form-textarea-receta" rows="4" placeholder="Observaciones generales de la receta, recomendaciones adicionales..."></textarea> </div> </div> </div>
 
             <!-- Datos ocultos -->
-            <input type="hidden" id="idCita" value="1" />
-            <input type="hidden" id="idMedico" value="1" />
-            <input type="hidden" id="idPaciente" value="1" />
-            <input type="hidden" id="idHistoriaClinica" value="1" />
+            <input type="hidden" id="idCita" value="@(ViewBag.IdCita ?? 0)" />
+            <input type="hidden" id="idMedico" value="@(ViewBag.IdMedico ?? 0)" />
+            <input type="hidden" id="idPaciente" value="@(ViewBag.IdPaciente ?? 0)" />
+            <input type="hidden" id="idHistoriaClinica" value="@(ViewBag.IdHistoriaClinica ?? 0)" />
 
             <!-- Botones -->
             <div class="actions-footer">

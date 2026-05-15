@@ -1,5 +1,7 @@
 const API_BASE_URL = "http://localhost:5122";
 let idPacienteActual = null;
+let idCitaActual = null;
+let idMedicoActual = null;
 let ordenesData = [];
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -10,6 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
 function obtenerParametrosURL() {
   const params = new URLSearchParams(window.location.search);
   idPacienteActual = params.get("idPaciente");
+  idCitaActual = params.get("idCita");
+  idMedicoActual = params.get("idMedico");
 
   if (!idPacienteActual) {
     showError("No se especificó el ID del paciente");
@@ -122,12 +126,14 @@ function mostrarOrdenes() {
                     let botonesOpciones = "";
                     if (orden.estado === "Pendiente") {
                       botonesOpciones = `
+                          <div class="order-actions">
                             <button class="btn-cancel" onclick="cancelarOrden(${orden.idOrden}, ${index})" title="Cancelar orden">
                                 Cancelar
                             </button>
                             <button class="btn-upload" onclick="subirDetalles(${orden.idOrden}, ${index})" title="Subir detalles">
                                 Subir Detalles
                             </button>
+                          </div>
                         `;
                     } else if (orden.estado === "Realizado") {
                       botonesOpciones = `
@@ -191,6 +197,18 @@ function mostrarOrdenes() {
                                         `
                                             : ""
                                         }
+                                        ${
+                                          orden.observacionesFinales
+                                            ? `
+                                            <div class="details-section">
+                                                <h4 class="details-section-title">Observaciones finales del laboratorio</h4>
+                                                <p style="padding: 12px; background: #f9fafb; border-radius: 6px; line-height: 1.6;">
+                                                    ${orden.observacionesFinales}
+                                                </p>
+                                            </div>
+                                        `
+                                            : ""
+                                        }
                                     </div>
                                 </div>
                             </td>
@@ -222,7 +240,11 @@ function verDetalles(index) {
 }
 
 function crearNuevaOrden() {
-  window.location.href = `/laboratorio/nueva-orden?idPaciente=${idPacienteActual}`;
+  const params = new URLSearchParams();
+  if (idPacienteActual) params.set("idPaciente", idPacienteActual);
+  if (idCitaActual) params.set("idCita", idCitaActual);
+  if (idMedicoActual) params.set("idMedico", idMedicoActual);
+  window.location.href = `/laboratorio/nueva-orden?${params.toString()}`;
 }
 
 // Función para cancelar una orden
@@ -259,7 +281,12 @@ async function cancelarOrden(idOrden, index) {
 // Función para subir detalles de una orden
 function subirDetalles(idOrden, index) {
   // Redirigir a una página de subida de detalles o abrir un modal
-  window.location.href = `/laboratorio/subir-detalles?idOrden=${idOrden}`;
+  const params = new URLSearchParams();
+  params.set("idOrden", idOrden);
+  if (idPacienteActual) params.set("idPaciente", idPacienteActual);
+  if (idCitaActual) params.set("idCita", idCitaActual);
+  if (idMedicoActual) params.set("idMedico", idMedicoActual);
+  window.location.href = `/laboratorio/subir-detalles?${params.toString()}`;
 }
 
 // Funciones de utilidad para mostrar mensajes

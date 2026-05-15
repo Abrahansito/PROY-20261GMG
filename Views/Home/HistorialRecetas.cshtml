@@ -78,6 +78,8 @@
 
 <!-- Datos ocultos del paciente -->
 <input type="hidden" id="idPaciente" value="@ViewBag.IdPaciente">
+<input type="hidden" id="idCita" value="@(ViewBag.IdCita ?? 0)">
+<input type="hidden" id="idMedico" value="@(ViewBag.IdMedico ?? 0)">
 
 @section Scripts {
     <script src="~/js/historial-recetas.js" asp-append-version="true"></script>

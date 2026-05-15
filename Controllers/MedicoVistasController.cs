@@ -34,6 +34,8 @@ namespace SGMG.Controllers
         {
             try
             {
+                filtro = (filtro ?? "").Trim().TrimStart('/');
+
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userId))
                 {
@@ -131,7 +133,8 @@ namespace SGMG.Controllers
                 int citasPendientes = citasHoy.Count(c => 
                     c.EstadoCita == "Programada" || 
                     c.EstadoCita == "Confirmada" || 
-                    c.EstadoCita == "Reservada");
+                    c.EstadoCita == "Reservada" ||
+                    c.EstadoCita == "Triada");
 
                 ViewBag.MedicoNombre = $"{medico.Nombre} {medico.ApellidoPaterno}";
                 ViewBag.Consultorio = consultorio;

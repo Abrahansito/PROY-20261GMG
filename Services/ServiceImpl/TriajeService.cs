@@ -31,7 +31,7 @@ namespace SGMG.Services.ServiceImpl
         await _triajeRepository.AddTriajeAsync(triaje);
 
         // Actualizar el estado de la cita a "Triada"
-        await ActualizarEstadoCita(triajeRequestDTO.IdPaciente);
+        await ActualizarEstadoCita(triajeRequestDTO.IdPaciente, triaje.IdTriage);
 
         return new GenericResponse<Triaje>(true, triaje, "Triaje registrado exitosamente.");
       }
@@ -41,28 +41,30 @@ namespace SGMG.Services.ServiceImpl
       }
     }
 
-    private async Task ActualizarEstadoCita(int idPaciente)
+    private async Task ActualizarEstadoCita(int idPaciente, int idTriaje)
     {
       try
       {
         Console.WriteLine($"Actualizando cita del paciente: {idPaciente}");
 
-        // Traer todas las citas confirmadas del paciente
         var citas = await _context.Citas
-            .Where(c => c.IdPaciente == idPaciente && c.EstadoCita == "Confirmada")
+            .Where(c => c.IdPaciente == idPaciente &&
+                        c.IdTriage == null &&
+                        (c.EstadoCita == "Pagado" || c.EstadoCita == "Confirmada"))
             .ToListAsync();
 
-        // Ordenar en memoria (evita error de TimeSpan en SQLite)
         var cita = citas
-            .OrderByDescending(c => c.FechaCita)
-            .ThenByDescending(c => c.HoraCita)
+            .OrderBy(c => c.FechaCita)
+            .ThenBy(c => c.HoraCita)
             .FirstOrDefault();
 
         if (cita != null)
         {
           Console.WriteLine($"Cita encontrada ID: {cita.IdCita}, Estado: {cita.EstadoCita}");
 
+          cita.IdTriage = idTriaje;
           cita.EstadoCita = "Triada";
+          _context.Entry(cita).Property(c => c.IdTriage).IsModified = true;
           _context.Entry(cita).Property(c => c.EstadoCita).IsModified = true;
 
           await _context.SaveChangesAsync();
@@ -92,6 +94,8 @@ namespace SGMG.Services.ServiceImpl
 
         if (triaje == null)
           return new GenericResponse<TriajeResponseDTO>(false, "Triaje no encontrado.");
+
+        var edadPaciente = await ObtenerEdadPacienteAsync(triaje.IdPaciente, triaje.Paciente?.Edad);
 
         // Mapear a DTO completo
         var triajeDTO = new TriajeResponseDTO
@@ -123,7 +127,7 @@ namespace SGMG.Services.ServiceImpl
           ApellidoPaterno = triaje.Paciente?.ApellidoPaterno ?? "",
           ApellidoMaterno = triaje.Paciente?.ApellidoMaterno ?? "",
           Sexo = triaje.Paciente?.Sexo ?? "",
-          Edad = triaje.Paciente?.Edad ?? 0,
+          Edad = edadPaciente,
           NombreCompletoPaciente = triaje.Paciente != null
                 ? $"{triaje.Paciente.ApellidoPaterno} {triaje.Paciente.ApellidoMaterno} {triaje.Paciente.Nombre}".Trim()
                 : ""
@@ -157,6 +161,8 @@ namespace SGMG.Services.ServiceImpl
         triaje = MapToTriaje(triajeRequestDTO, triaje);
         await _triajeRepository.UpdateTriajeAsync(triaje);
 
+        var edadPaciente = await ObtenerEdadPacienteAsync(triaje.IdPaciente, paciente?.Edad);
+
         // Mapear a DTO (sin consulta adicional)
         var triajeDTO = new TriajeResponseDTO
         {
@@ -187,7 +193,7 @@ namespace SGMG.Services.ServiceImpl
           ApellidoPaterno = paciente?.ApellidoPaterno ?? "",
           ApellidoMaterno = paciente?.ApellidoMaterno ?? "",
           Sexo = paciente?.Sexo ?? "",
-          Edad = paciente?.Edad ?? 0
+          Edad = edadPaciente
         };
 
         return new GenericResponse<TriajeResponseDTO>(true, triajeDTO, "Triaje actualizado correctamente.");
@@ -221,13 +227,13 @@ namespace SGMG.Services.ServiceImpl
 
         // Obtener IDs únicos de pacientes
         var idsPacientes = triajes.Select(t => t.IdPaciente).Distinct().ToList();
+        var edadesPorPaciente = await ObtenerEdadesPacientesAsync(idsPacientes);
 
         // Traer TODAS las citas "Triadas" de esos pacientes en UNA sola consulta
         var citasPagadas = await _context.Citas
         .Include(c => c.Medico)
         .Where(c => idsPacientes.Contains(c.IdPaciente) &&
-                    c.EstadoCita == "Pagado" &&           // ✅ Estado Pagado
-                    c.IdTriage != null)                   // ✅ Tiene triaje
+                    (c.IdTriage != null || c.EstadoCita == "Triada" || c.EstadoCita == "Pagado"))
         .ToListAsync();
 
 
@@ -237,6 +243,11 @@ namespace SGMG.Services.ServiceImpl
         {
           // Buscar la cita del paciente (ya está en memoria)
           var cita = citasPagadas
+              .Where(c => c.IdTriage == t.IdTriage)
+              .OrderByDescending(c => c.FechaCita)
+              .ThenByDescending(c => c.HoraCita)
+              .FirstOrDefault()
+              ?? citasPagadas
               .Where(c => c.IdPaciente == t.IdPaciente)
               .OrderByDescending(c => c.FechaCita)
               .ThenByDescending(c => c.HoraCita)
@@ -271,7 +282,7 @@ namespace SGMG.Services.ServiceImpl
             ApellidoPaterno = t.Paciente?.ApellidoPaterno ?? "",
             ApellidoMaterno = t.Paciente?.ApellidoMaterno ?? "",
             Sexo = t.Paciente?.Sexo ?? "",
-            Edad = t.Paciente?.Edad ?? 0,
+            Edad = ObtenerEdadDesdeCache(t.IdPaciente, t.Paciente?.Edad, edadesPorPaciente),
             NombreCompletoPaciente = t.Paciente != null
                           ? $"{t.Paciente.ApellidoPaterno} {t.Paciente.ApellidoMaterno} {t.Paciente.Nombre}".Trim()
                           : "",
@@ -378,26 +389,28 @@ namespace SGMG.Services.ServiceImpl
 
         // Obtener IDs de pacientes
         var idsPacientes = triajes.Select(t => t.IdPaciente).Distinct().ToList();
+        var edadesPorPaciente = await ObtenerEdadesPacientesAsync(idsPacientes);
 
         // Traer citas triadas
         var citasTriadas = await _context.Citas
             .Include(c => c.Medico)
-            .Where(c => idsPacientes.Contains(c.IdPaciente) && c.EstadoCita == "Triada")
+            .Where(c => idsPacientes.Contains(c.IdPaciente) &&
+                        (c.IdTriage != null || c.EstadoCita == "Triada" || c.EstadoCita == "Pagado"))
             .ToListAsync();
-
-        var citasPorPaciente = citasTriadas
-            .GroupBy(c => c.IdPaciente)
-            .ToDictionary(
-                g => g.Key,
-                g => g.OrderByDescending(c => c.FechaCita)
-                       .ThenByDescending(c => c.HoraCita)
-                       .First()
-            );
 
         // Mapear a DTO
         var triajesDTO = triajes.Select(t =>
         {
-          citasPorPaciente.TryGetValue(t.IdPaciente, out var cita);
+          var cita = citasTriadas
+              .Where(c => c.IdTriage == t.IdTriage)
+              .OrderByDescending(c => c.FechaCita)
+              .ThenByDescending(c => c.HoraCita)
+              .FirstOrDefault()
+              ?? citasTriadas
+              .Where(c => c.IdPaciente == t.IdPaciente)
+              .OrderByDescending(c => c.FechaCita)
+              .ThenByDescending(c => c.HoraCita)
+              .FirstOrDefault();
 
           return new TriajeResponseDTO
           {
@@ -426,7 +439,7 @@ namespace SGMG.Services.ServiceImpl
             ApellidoPaterno = t.Paciente?.ApellidoPaterno ?? "",
             ApellidoMaterno = t.Paciente?.ApellidoMaterno ?? "",
             Sexo = t.Paciente?.Sexo ?? "",
-            Edad = t.Paciente?.Edad ?? 0,
+            Edad = ObtenerEdadDesdeCache(t.IdPaciente, t.Paciente?.Edad, edadesPorPaciente),
             NombreCompletoPaciente = t.Paciente != null
                           ? $"{t.Paciente.ApellidoPaterno} {t.Paciente.ApellidoMaterno} {t.Paciente.Nombre}".Trim()
                           : "",
@@ -481,7 +494,8 @@ namespace SGMG.Services.ServiceImpl
     .Where(c => c.EstadoCita == "Pagado" &&
                c.Medico != null &&
                c.Medico.IdConsultorio == idConsultorio &&
-               c.IdTriage == null) // ✅ Solo citas SIN triaje
+               c.IdTriage == null &&
+               !_context.Triages.Any(t => t.IdPaciente == c.IdPaciente))
     .ToListAsync();
 
 
@@ -545,13 +559,9 @@ namespace SGMG.Services.ServiceImpl
         var triajes = await _triajeRepository.GetTriajesByPacienteAsync(idPaciente);
 
         // 4. Calcular edad
-        int edad = paciente.Edad;
-        if (historiaClinica?.FechaNacimiento != null)
-        {
-          var today = DateTime.Today;
-          edad = today.Year - historiaClinica.FechaNacimiento.Year;
-          if (historiaClinica.FechaNacimiento.Date > today.AddYears(-edad)) edad--;
-        }
+        int edad = historiaClinica?.FechaNacimiento != null
+          ? CalcularEdad(historiaClinica.FechaNacimiento)
+          : paciente.Edad;
 
         // 5. Mapear a DTO
         var historialDTO = new HistorialTriajeDTO
@@ -610,6 +620,50 @@ namespace SGMG.Services.ServiceImpl
             $"Error: {ex.Message}"
         );
       }
+    }
+
+    private async Task<int> ObtenerEdadPacienteAsync(int idPaciente, int? edadActual)
+    {
+      if ((edadActual ?? 0) > 0)
+        return edadActual!.Value;
+
+      var fechaNacimiento = await _context.HistoriasClinicas
+          .Where(h => h.IdPaciente == idPaciente)
+          .Select(h => (DateTime?)h.FechaNacimiento)
+          .FirstOrDefaultAsync();
+
+      return fechaNacimiento.HasValue ? CalcularEdad(fechaNacimiento.Value) : 0;
+    }
+
+    private async Task<Dictionary<int, int>> ObtenerEdadesPacientesAsync(List<int> idsPacientes)
+    {
+      var fechasNacimiento = await _context.HistoriasClinicas
+          .Where(h => idsPacientes.Contains(h.IdPaciente))
+          .Select(h => new { h.IdPaciente, h.FechaNacimiento })
+          .ToListAsync();
+
+      return fechasNacimiento
+          .GroupBy(h => h.IdPaciente)
+          .ToDictionary(g => g.Key, g => CalcularEdad(g.First().FechaNacimiento));
+    }
+
+    private static int ObtenerEdadDesdeCache(int idPaciente, int? edadActual, Dictionary<int, int> edadesPorPaciente)
+    {
+      if ((edadActual ?? 0) > 0)
+        return edadActual!.Value;
+
+      return edadesPorPaciente.TryGetValue(idPaciente, out var edad) ? edad : 0;
+    }
+
+    private static int CalcularEdad(DateTime fechaNacimiento)
+    {
+      var hoy = DateTime.Today;
+      var edad = hoy.Year - fechaNacimiento.Year;
+
+      if (fechaNacimiento.Date > hoy.AddYears(-edad))
+        edad--;
+
+      return edad;
     }
 
 

@@ -1,5 +1,7 @@
 const API_BASE_URL = "http://localhost:5122";
 let idPacienteActual = null;
+let idCitaActual = null;
+let idMedicoActual = null;
 
 document.addEventListener("DOMContentLoaded", function () {
   obtenerParametrosURL();
@@ -9,6 +11,8 @@ document.addEventListener("DOMContentLoaded", function () {
 function obtenerParametrosURL() {
   const params = new URLSearchParams(window.location.search);
   idPacienteActual = params.get("idPaciente");
+  idCitaActual = params.get("idCita");
+  idMedicoActual = params.get("idMedico");
 
   if (!idPacienteActual) {
     showError("No se especificó el ID del paciente");
@@ -85,7 +89,8 @@ async function guardarOrden(event) {
 
   const ordenDTO = {
     idPaciente: parseInt(idPacienteActual),
-    idMedico: 1, // TODO: Obtener del contexto del usuario logueado
+    idMedico: idMedicoActual ? parseInt(idMedicoActual) : 0,
+    idCita: idCitaActual ? parseInt(idCitaActual) : null,
     tipoExamen: tipoExamen,
     observacionesAdicionales: observaciones,
     estado: "Pendiente", // Estado por defecto
@@ -110,7 +115,7 @@ async function guardarOrden(event) {
     if (result.success) {
       showSuccess("Orden de laboratorio creada exitosamente");
       setTimeout(() => {
-        window.location.href = `/laboratorio?idPaciente=${idPacienteActual}`;
+        window.location.href = construirUrlLaboratorio();
       }, 1500);
     } else {
       showError(
@@ -132,8 +137,16 @@ function volver() {
       "¿Está seguro de que desea salir? Los datos no guardados se perderán."
     )
   ) {
-    window.location.href = `/laboratorio?idPaciente=${idPacienteActual}`;
+    window.location.href = construirUrlLaboratorio();
   }
+}
+
+function construirUrlLaboratorio() {
+  const params = new URLSearchParams();
+  if (idPacienteActual) params.set("idPaciente", idPacienteActual);
+  if (idCitaActual) params.set("idCita", idCitaActual);
+  if (idMedicoActual) params.set("idMedico", idMedicoActual);
+  return `/laboratorio?${params.toString()}`;
 }
 
 // Funciones de utilidad para mostrar mensajes

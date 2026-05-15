@@ -57,6 +57,15 @@ namespace PROY_20252SGMG.Controllers
           return RedirectToAction("Index", "Home");
         }
 
+        var historiaClinica = await _context.HistoriasClinicas
+            .Where(h => h.IdPaciente == idPaciente.Value)
+            .OrderByDescending(h => h.IdHistoria)
+            .FirstOrDefaultAsync();
+
+        var edadPaciente = historiaClinica != null
+            ? CalcularEdad(historiaClinica.FechaNacimiento)
+            : paciente.Edad;
+
         // 2️⃣ Traer citas (sin ordenar en SQL por TimeSpan)
         var citas = await _context.Citas
             .Where(c => c.IdPaciente == idPaciente.Value)
@@ -85,14 +94,16 @@ namespace PROY_20252SGMG.Controllers
         }).ToList();
 
         // 5️⃣ Datos del paciente
-        string seguro = "SIS - Sistema Integral de Salud";
+        string seguro = !string.IsNullOrWhiteSpace(historiaClinica?.TipoSeguro)
+            ? $"{historiaClinica.TipoSeguro} - Sistema Integral de Salud"
+            : "SIS - Sistema Integral de Salud";
 
         ViewBag.Paciente = new
         {
           Dni = paciente.NumeroDocumento,
           NombreCompleto = $"{paciente.Nombre} {paciente.ApellidoPaterno} {paciente.ApellidoMaterno}",
           Sexo = paciente.Sexo,
-          Edad = paciente.Edad,
+          Edad = edadPaciente,
           Seguro = seguro
         };
 
@@ -112,6 +123,17 @@ namespace PROY_20252SGMG.Controllers
 
         return View();
       }
+    }
+
+    private static int CalcularEdad(DateTime fechaNacimiento)
+    {
+      var hoy = DateTime.Today;
+      var edad = hoy.Year - fechaNacimiento.Year;
+
+      if (fechaNacimiento.Date > hoy.AddYears(-edad))
+        edad--;
+
+      return Math.Max(edad, 0);
     }
 
     [HttpGet]

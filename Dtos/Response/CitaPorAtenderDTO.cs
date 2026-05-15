@@ -5,6 +5,7 @@ namespace SGMG.Dtos.Response
     {
         public int IdCita { get; set; }
         public int IdPaciente { get; set; }
+        public int IdMedico { get; set; }
         public string NumeroDocumento { get; set; } = "";
         public string TipoDocumento { get; set; } = "";
         public string NombreCompleto { get; set; } = "";

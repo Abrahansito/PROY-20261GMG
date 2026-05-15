@@ -2,10 +2,10 @@
 const appState = {
   medicamentos: [],
   recetaId: null,
-  idCita: 1,
-  idMedico: 1,
-  idPaciente: 1,
-  idHistoriaClinica: 1,
+  idCita: null,
+  idMedico: null,
+  idPaciente: null,
+  idHistoriaClinica: null,
 };
 
 let elementos = {};
@@ -38,10 +38,10 @@ function inicializarElementos() {
   };
 
   // Obtener IDs ocultos
-  appState.idCita = parseInt(document.getElementById("idCita")?.value) || 1;
-  appState.idMedico = parseInt(document.getElementById("idMedico")?.value) || 1;
+  appState.idCita = parseInt(document.getElementById("idCita")?.value) || null;
+  appState.idMedico = parseInt(document.getElementById("idMedico")?.value) || null;
   appState.idPaciente =
-    parseInt(document.getElementById("idPaciente")?.value) || 1;
+    parseInt(document.getElementById("idPaciente")?.value) || null;
   appState.idHistoriaClinica =
     parseInt(document.getElementById("idHistoriaClinica")?.value) || null;
 }
@@ -56,7 +56,7 @@ function inicializarEventos() {
   if (elementos.btnVolver)
     elementos.btnVolver.addEventListener(
       "click",
-      () => (window.location.href = "/")
+      () => (window.location.href = construirUrlHistoriaClinica())
     );
 }
 
@@ -128,6 +128,8 @@ function validarCamposMedicamento() {
 
 // ===== Agregar medicamento =====
 async function agregarMedicamento() {
+  if (!validarContextoReceta()) return;
+
   if (!validarCamposMedicamento()) {
     mostrarAlerta("Complete todos los campos obligatorios", "error");
     return;
@@ -240,6 +242,8 @@ function limpiarFormularioMedicamento() {
 
 // ===== Guardar receta =====
 async function guardarReceta() {
+  if (!validarContextoReceta()) return;
+
   if (appState.medicamentos.length === 0) {
     mostrarAlerta("Debe agregar al menos un medicamento", "error");
     return;
@@ -305,3 +309,20 @@ function mostrarAlerta(mensaje, tipo = "info") {
 }
 
 window.eliminarMedicamento = eliminarMedicamento;
+
+function validarContextoReceta() {
+  if (!appState.idPaciente || !appState.idCita || !appState.idMedico) {
+    mostrarAlerta("No se encontro el contexto de la cita activa para generar la receta", "error");
+    return false;
+  }
+
+  return true;
+}
+
+function construirUrlHistoriaClinica() {
+  const params = new URLSearchParams();
+  if (appState.idPaciente) params.set("idPaciente", appState.idPaciente);
+  if (appState.idCita) params.set("idCita", appState.idCita);
+  if (appState.idMedico) params.set("idMedico", appState.idMedico);
+  return `/historia-clinica/ver?${params.toString()}`;
+}

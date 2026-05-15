@@ -135,7 +135,9 @@ namespace SGMG.Services.ServiceImpl
           var todasLasCitas = await _context.Citas
               .Include(c => c.Paciente)
               .Include(c => c.Medico)
-              .Where(c => c.EstadoCita == "Pagado") // Solo citas pagadas
+              .Where(c => c.EstadoCita == "Pagado" &&
+                          c.IdTriage == null &&
+                          !_context.Triages.Any(t => t.IdPaciente == c.IdPaciente))
               .OrderBy(c => c.FechaCita)
               .ThenBy(c => c.HoraCita)
               .ToListAsync();
@@ -169,6 +171,8 @@ namespace SGMG.Services.ServiceImpl
             .Include(c => c.Paciente)
             .Include(c => c.Medico)
             .Where(c => c.EstadoCita == "Pagado" &&
+                       c.IdTriage == null &&
+                       !_context.Triages.Any(t => t.IdPaciente == c.IdPaciente) &&
                        c.Paciente.NumeroDocumento == numeroDoc)
             .ToListAsync();
 
@@ -217,6 +221,8 @@ namespace SGMG.Services.ServiceImpl
             .Include(c => c.Paciente)
             .Include(c => c.Medico)
             .Where(c => c.EstadoCita == "Pagado" &&
+                       c.IdTriage == null &&
+                       !_context.Triages.Any(t => t.IdPaciente == c.IdPaciente) &&
                        c.FechaCita < ahora &&
                        c.Paciente.NumeroDocumento == numeroDoc)
             .ToListAsync();
@@ -263,7 +269,10 @@ namespace SGMG.Services.ServiceImpl
             .Where(c => c.IdMedico == idMedico &&
                        c.FechaCita.Date == fecha.Date &&
                        c.Consultorio == consultorio &&
-                       (c.EstadoCita == "Programada" || c.EstadoCita == "Pagado" || c.EstadoCita == "Reservada"))
+                       (c.EstadoCita == "Programada" ||
+                        c.EstadoCita == "Pagado" ||
+                        c.EstadoCita == "Reservada" ||
+                        c.EstadoCita == "Triada"))
             .ToListAsync(); // Primero obtener los datos
 
         // CORREGIDO: Ordenar en memoria por HoraCita
@@ -271,16 +280,20 @@ namespace SGMG.Services.ServiceImpl
             .OrderBy(c => c.HoraCita)
             .ToList();
 
+        var idsPacientes = citasOrdenadas.Select(c => c.IdPaciente).Distinct().ToList();
+        var edadesPorPaciente = await ObtenerEdadesPacientesAsync(idsPacientes);
+
         var citasDTO = citasOrdenadas.Select(c => new CitaPorAtenderDTO
         {
           IdCita = c.IdCita,
           IdPaciente = c.IdPaciente,
+          IdMedico = c.IdMedico,
           NumeroDocumento = c.Paciente?.NumeroDocumento ?? "",
           TipoDocumento = c.Paciente?.TipoDocumento ?? "",
           NombreCompleto = c.Paciente != null ?
                 $"{c.Paciente.Nombre} {c.Paciente.ApellidoPaterno} {c.Paciente.ApellidoMaterno}".Trim() : "",
           Sexo = c.Paciente?.Sexo ?? "",
-          Edad = c.Paciente?.Edad ?? 0,
+          Edad = ObtenerEdadDesdeCache(c.IdPaciente, c.Paciente?.Edad, edadesPorPaciente),
           FechaCita = c.FechaCita,
           HoraCita = c.HoraCita,
           Consultorio = c.Consultorio,
@@ -321,10 +334,12 @@ namespace SGMG.Services.ServiceImpl
 
         if (!string.IsNullOrEmpty(filtro))
         {
+          filtro = filtro.Trim().TrimStart('/').ToLower();
+
           citas = citas.Where(c =>
-              c.NumeroDocumento.Contains(filtro) ||
-              c.NombreCompleto.ToLower().Contains(filtro.ToLower()) ||
-              c.TipoDocumento.ToLower().Contains(filtro.ToLower())
+              c.NumeroDocumento.ToLower().Contains(filtro) ||
+              c.NombreCompleto.ToLower().Contains(filtro) ||
+              c.TipoDocumento.ToLower().Contains(filtro)
           ).ToList();
         }
 
@@ -344,6 +359,37 @@ namespace SGMG.Services.ServiceImpl
           Message = $"Error al filtrar citas: {ex.Message}"
         };
       }
+    }
+
+    private async Task<Dictionary<int, int>> ObtenerEdadesPacientesAsync(List<int> idsPacientes)
+    {
+      var fechasNacimiento = await _context.HistoriasClinicas
+          .Where(h => idsPacientes.Contains(h.IdPaciente))
+          .Select(h => new { h.IdPaciente, h.FechaNacimiento })
+          .ToListAsync();
+
+      return fechasNacimiento
+          .GroupBy(h => h.IdPaciente)
+          .ToDictionary(g => g.Key, g => CalcularEdad(g.First().FechaNacimiento));
+    }
+
+    private static int ObtenerEdadDesdeCache(int idPaciente, int? edadActual, Dictionary<int, int> edadesPorPaciente)
+    {
+      if ((edadActual ?? 0) > 0)
+        return edadActual!.Value;
+
+      return edadesPorPaciente.TryGetValue(idPaciente, out var edad) ? edad : 0;
+    }
+
+    private static int CalcularEdad(DateTime fechaNacimiento)
+    {
+      var hoy = DateTime.Today;
+      var edad = hoy.Year - fechaNacimiento.Year;
+
+      if (fechaNacimiento.Date > hoy.AddYears(-edad))
+        edad--;
+
+      return edad;
     }
 
   }

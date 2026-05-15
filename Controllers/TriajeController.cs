@@ -138,9 +138,6 @@ namespace SGMG.Controllers
     {
       try
       {
-        // ⚠️ DESCOMENTAR PARA PROBAR EXCEPCIÓN
-        throw new Exception("");
-
         await CargarDatosEnfermera();
 
         if (id != triajeRequest.IdTriaje)

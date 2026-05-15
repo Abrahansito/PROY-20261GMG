@@ -37,6 +37,11 @@ namespace SGMG.Services.ServiceImpl
 
                 // 3. Obtener diagnósticos
                 var diagnosticos = await _diagnosticoRepository.GetDiagnosticosByPacienteAsync(idPaciente);
+                var consultas = await _context.Consultas
+                    .Include(c => c.Medico)
+                    .Include(c => c.Cita)
+                    .Where(c => c.IdPaciente == idPaciente && !string.IsNullOrWhiteSpace(c.DiagnosticoPrincipal))
+                    .ToListAsync();
 
                 // 4. Calcular edad
                 int edad = paciente.Edad;
@@ -70,7 +75,22 @@ namespace SGMG.Services.ServiceImpl
                         Consultorio = d.Cita?.Consultorio ?? "N/A",
                         ObservacionesMedicas = d.ObservacionesMedicas,
                         TratamientoEspecifico = d.TratamientoEspecifico
-                    }).ToList()
+                    })
+                    .Concat(consultas.Select(c => new DiagnosticoResponseDTO
+                    {
+                        IdDiagnostico = c.IdConsulta,
+                        FechaDiagnostico = c.FechaConsulta,
+                        DiagnosticoPrincipal = $"{c.DiagnosticoPrincipal} ({c.CodigoCie10})",
+                        CodigoCie10 = c.CodigoCie10,
+                        NombreCompletoMedico = c.Medico != null
+                            ? $"Dr. {c.Medico.Nombre} {c.Medico.ApellidoPaterno}".Trim()
+                            : "N/A",
+                        Consultorio = c.Cita?.Consultorio ?? "N/A",
+                        ObservacionesMedicas = c.Observaciones,
+                        TratamientoEspecifico = c.IndicacionesRecomendaciones
+                    }))
+                    .OrderByDescending(d => d.FechaDiagnostico)
+                    .ToList()
                 };
 
                 return new GenericResponse<HistorialClinicoDTO>(true, historial, "Historial obtenido correctamente.");
@@ -87,6 +107,33 @@ namespace SGMG.Services.ServiceImpl
             try
             {
                 var diagnostico = await _diagnosticoRepository.GetDiagnosticoByIdAsync(idDiagnostico);
+
+                if (diagnostico == null)
+                {
+                    var consulta = await _context.Consultas
+                        .Include(c => c.Medico)
+                        .Include(c => c.Cita)
+                        .FirstOrDefaultAsync(c => c.IdConsulta == idDiagnostico);
+
+                    if (consulta != null)
+                    {
+                        var consultaDto = new DiagnosticoResponseDTO
+                        {
+                            IdDiagnostico = consulta.IdConsulta,
+                            FechaDiagnostico = consulta.FechaConsulta,
+                            DiagnosticoPrincipal = $"{consulta.DiagnosticoPrincipal} ({consulta.CodigoCie10})",
+                            CodigoCie10 = consulta.CodigoCie10,
+                            NombreCompletoMedico = consulta.Medico != null
+                                ? $"Dr. {consulta.Medico.Nombre} {consulta.Medico.ApellidoPaterno}".Trim()
+                                : "N/A",
+                            Consultorio = consulta.Cita?.Consultorio ?? "N/A",
+                            ObservacionesMedicas = consulta.Observaciones,
+                            TratamientoEspecifico = consulta.IndicacionesRecomendaciones
+                        };
+
+                        return new GenericResponse<DiagnosticoResponseDTO>(true, consultaDto, "Diagnostico obtenido correctamente.");
+                    }
+                }
 
                 if (diagnostico == null)
                     return new GenericResponse<DiagnosticoResponseDTO>(false, "Diagnóstico no encontrado.");

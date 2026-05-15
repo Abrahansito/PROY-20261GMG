@@ -85,6 +85,31 @@ namespace SGMG.Controllers
       return await _citaService.GetCitaByIdAsync(id);
     }
 
+    [HttpPut]
+    [Route("/citas/terminar/{id}")]
+    public async Task<IActionResult> TerminarCita(int id)
+    {
+      try
+      {
+        if (id <= 0)
+          return Json(new { success = false, message = "ID de cita invalido", mensaje = "ID de cita invalido" });
+
+        var cita = await _context.Citas.FirstOrDefaultAsync(c => c.IdCita == id);
+        if (cita == null)
+          return Json(new { success = false, message = "Cita no encontrada", mensaje = "Cita no encontrada" });
+
+        cita.EstadoCita = "Atendida";
+        await _context.SaveChangesAsync();
+
+        return Json(new { success = true, message = "Cita terminada correctamente", mensaje = "Cita terminada correctamente" });
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex, "Error al terminar cita {IdCita}", id);
+        return Json(new { success = false, message = "Error al terminar la cita", mensaje = "Error al terminar la cita" });
+      }
+    }
+
     //MEDICO Y PACIENTE - VISTA HORARIO Y RESERVA CITA
     public IActionResult HorarioMedico(int? idMedico, int? idPaciente, int? semana)
     {
@@ -162,10 +187,12 @@ namespace SGMG.Controllers
           var diasDiferencia = (cita.FechaCita.Date - inicioSemanaBase.Date).Days;
           var semanaAnterior = diasDiferencia / 7;
           var inicioSemanaAnterior = inicioSemanaBase.AddDays(semanaAnterior * 7).Date;
+          var finSemanaAnterior = inicioSemanaAnterior.AddDays(6).Date;
 
           var disponibilidadAnterior = await _context.DisponibilidadesSemanales
               .FirstOrDefaultAsync(d => d.IdMedico == medicoAnterior &&
-                                       d.FechaInicioSemana.Date == inicioSemanaAnterior.Date);
+                                       d.FechaInicioSemana.Date <= finSemanaAnterior &&
+                                       d.FechaFinSemana.Date >= inicioSemanaAnterior);
 
           if (disponibilidadAnterior != null && disponibilidadAnterior.CitasActuales > 0)
           {
@@ -191,10 +218,12 @@ namespace SGMG.Controllers
 
           var inicioSemanaBase = hoy.AddDays(-diasDesdeInicio);
           var inicioSemana = inicioSemanaBase.AddDays(request.Semana * 7).Date;
+          var finSemana = inicioSemana.AddDays(6).Date;
 
           var disponibilidad = await _context.DisponibilidadesSemanales
               .FirstOrDefaultAsync(d => d.IdMedico == request.IdMedico &&
-                                       d.FechaInicioSemana.Date == inicioSemana.Date);
+                                       d.FechaInicioSemana.Date <= finSemana &&
+                                       d.FechaFinSemana.Date >= inicioSemana);
 
           if (disponibilidad != null)
           {
@@ -318,7 +347,8 @@ namespace SGMG.Controllers
         // Comparar solo las fechas sin hora
         _logger.LogInformation($"🔍 Buscando disponibilidad para fecha inicio: {inicioSemana:yyyy-MM-dd}");
         var disponibilidad = todasDisponibilidades
-            .FirstOrDefault(d => d.FechaInicioSemana.Date == inicioSemana.Date);
+            .FirstOrDefault(d => d.FechaInicioSemana.Date <= finSemana.Date &&
+                                 d.FechaFinSemana.Date >= inicioSemana.Date);
 
         if (disponibilidad == null)
         {
@@ -557,13 +587,15 @@ namespace SGMG.Controllers
 
         var inicioSemanaBase = hoy.AddDays(-diasDesdeInicio);
         var inicioSemana = inicioSemanaBase.AddDays(datos.Semana * 7).Date;
+        var finSemana = inicioSemana.AddDays(6).Date;
 
         _logger.LogInformation($"🔍 Buscando disponibilidad semanal:");
         _logger.LogInformation($"   → Fecha inicio semana: {inicioSemana:yyyy-MM-dd}");
 
         var disponibilidad = _context.DisponibilidadesSemanales
             .FirstOrDefault(d => d.IdMedico == datos.IdMedico &&
-                               d.FechaInicioSemana.Date == inicioSemana.Date);
+                               d.FechaInicioSemana.Date <= finSemana &&
+                               d.FechaFinSemana.Date >= inicioSemana);
 
         if (disponibilidad != null)
         {
@@ -637,9 +669,12 @@ namespace SGMG.Controllers
         var diasDesdeInicio = (int)fechaCita.DayOfWeek - (int)DayOfWeek.Monday;
         if (diasDesdeInicio < 0) diasDesdeInicio += 7;
         var inicioSemana = fechaCita.AddDays(-diasDesdeInicio).Date;
+        var finSemana = inicioSemana.AddDays(6).Date;
 
         var disponibilidad = _context.DisponibilidadesSemanales
-            .FirstOrDefault(d => d.IdMedico == cita.IdMedico && d.FechaInicioSemana.Date == inicioSemana.Date);
+            .FirstOrDefault(d => d.IdMedico == cita.IdMedico &&
+                                 d.FechaInicioSemana.Date <= finSemana &&
+                                 d.FechaFinSemana.Date >= inicioSemana);
 
         if (disponibilidad != null)
         {

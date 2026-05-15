@@ -9,6 +9,8 @@ namespace SGMG.Services.ServiceImpl
 {
     public class LaboratorioService : ILaboratorioService
     {
+        private const string ObservacionesFinalesMarker = "--- Observaciones finales del laboratorio ---";
+
         private readonly IOrdenLaboratorioRepository _laboratorioRepository;
         private readonly ApplicationDbContext _context;
 
@@ -65,7 +67,8 @@ namespace SGMG.Services.ServiceImpl
                         TipoExamen = o.TipoExamen,
                         NombreCompletoPaciente = $"{paciente.Nombre} {paciente.ApellidoPaterno} {paciente.ApellidoMaterno}".Trim(),
                         FechaSolicitud = o.FechaSolicitud,
-                        ObservacionesAdicionales = o.ObservacionesAdicionales,
+                        ObservacionesAdicionales = ObtenerObservacionesOrden(o.ObservacionesAdicionales),
+                        ObservacionesFinales = ObtenerObservacionesFinales(o.ObservacionesAdicionales),
                         Resultados = o.Resultados,
                         Estado = o.Estado,
                         FechaResultado = o.FechaResultado
@@ -89,6 +92,10 @@ namespace SGMG.Services.ServiceImpl
         {
             try
             {
+                var contextoValido = await CompletarContextoAtencionAsync(dto);
+                if (!contextoValido)
+                    return new GenericResponse<OrdenLaboratorioResponseDTO>(false, "No se encontro el medico de la atencion actual");
+
                 var numeroOrden = await _laboratorioRepository.GenerarNumeroOrdenAsync();
 
                 var orden = new OrdenLaboratorio
@@ -114,7 +121,8 @@ namespace SGMG.Services.ServiceImpl
                         ? $"{paciente.Nombre} {paciente.ApellidoPaterno} {paciente.ApellidoMaterno}".Trim()
                         : "",
                     FechaSolicitud = orden.FechaSolicitud,
-                    ObservacionesAdicionales = orden.ObservacionesAdicionales,
+                    ObservacionesAdicionales = ObtenerObservacionesOrden(orden.ObservacionesAdicionales),
+                    ObservacionesFinales = ObtenerObservacionesFinales(orden.ObservacionesAdicionales),
                     Estado = orden.Estado
                 };
 
@@ -161,7 +169,8 @@ namespace SGMG.Services.ServiceImpl
                         : "",
                     DniPaciente = orden.Paciente?.NumeroDocumento ?? "",
                     FechaSolicitud = orden.FechaSolicitud,
-                    ObservacionesAdicionales = orden.ObservacionesAdicionales,
+                    ObservacionesAdicionales = ObtenerObservacionesOrden(orden.ObservacionesAdicionales),
+                    ObservacionesFinales = ObtenerObservacionesFinales(orden.ObservacionesAdicionales),
                     Resultados = orden.Resultados,
                     Estado = orden.Estado,
                     FechaResultado = orden.FechaResultado
@@ -205,7 +214,8 @@ namespace SGMG.Services.ServiceImpl
                     FechaResultado = orden.FechaResultado,
                     Estado = orden.Estado,
                     Resultados = orden.Resultados,
-                    ObservacionesAdicionales = orden.ObservacionesAdicionales
+                    ObservacionesAdicionales = ObtenerObservacionesOrden(orden.ObservacionesAdicionales),
+                    ObservacionesFinales = ObtenerObservacionesFinales(orden.ObservacionesAdicionales)
                 };
 
                 return new GenericResponse<OrdenLaboratorioResponseDTO>(true, ordenDTO, "Orden obtenida exitosamente");
@@ -266,12 +276,10 @@ namespace SGMG.Services.ServiceImpl
                 orden.FechaResultado = request.FechaResultado;
                 orden.Estado = "Realizado";
 
-                // Agregar observaciones finales si existen
-                if (!string.IsNullOrEmpty(request.ObservacionesFinales))
-                {
-                    orden.ObservacionesAdicionales +=
-                        $"\n\n--- Observaciones finales del laboratorio ---\n{request.ObservacionesFinales}";
-                }
+                var observacionesOrden = ObtenerObservacionesOrden(orden.ObservacionesAdicionales);
+                orden.ObservacionesAdicionales = string.IsNullOrWhiteSpace(request.ObservacionesFinales)
+                    ? observacionesOrden
+                    : $"{observacionesOrden}\n\n{ObservacionesFinalesMarker}\n{request.ObservacionesFinales.Trim()}";
 
                 await _laboratorioRepository.UpdateOrdenAsync(orden);
 
@@ -281,6 +289,70 @@ namespace SGMG.Services.ServiceImpl
             {
                 return new GenericResponse<bool>(false, $"Error al actualizar resultados: {ex.Message}");
             }
+        }
+
+        private async Task<bool> CompletarContextoAtencionAsync(OrdenLaboratorioRequestDTO dto)
+        {
+            if (dto.IdMedico > 0)
+                return true;
+
+            Cita? cita = null;
+
+            if (dto.IdCita.HasValue && dto.IdCita.Value > 0)
+            {
+                cita = await _context.Citas
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.IdCita == dto.IdCita.Value);
+            }
+
+            if (cita == null)
+            {
+                var estadosAtencion = new[] { "Triada", "Pagado", "Pendiente", "Programada", "Reservada" };
+
+                cita = await _context.Citas
+                    .AsNoTracking()
+                    .Where(c => c.IdPaciente == dto.IdPaciente && estadosAtencion.Contains(c.EstadoCita))
+                    .OrderByDescending(c => c.FechaCita)
+                    .ThenByDescending(c => c.HoraCita)
+                    .ThenByDescending(c => c.IdCita)
+                    .FirstOrDefaultAsync();
+            }
+
+            if (cita == null || cita.IdMedico <= 0)
+                return false;
+
+            dto.IdMedico = cita.IdMedico;
+            dto.IdCita ??= cita.IdCita;
+            return true;
+        }
+
+        private static string ObtenerObservacionesOrden(string? observaciones)
+        {
+            if (string.IsNullOrWhiteSpace(observaciones))
+                return "";
+
+            var markerIndex = observaciones.IndexOf(
+                ObservacionesFinalesMarker,
+                StringComparison.OrdinalIgnoreCase);
+
+            return markerIndex >= 0
+                ? observaciones[..markerIndex].Trim()
+                : observaciones.Trim();
+        }
+
+        private static string ObtenerObservacionesFinales(string? observaciones)
+        {
+            if (string.IsNullOrWhiteSpace(observaciones))
+                return "";
+
+            var markerIndex = observaciones.IndexOf(
+                ObservacionesFinalesMarker,
+                StringComparison.OrdinalIgnoreCase);
+
+            if (markerIndex < 0)
+                return "";
+
+            return observaciones[(markerIndex + ObservacionesFinalesMarker.Length)..].Trim();
         }
     }
 }

@@ -1,5 +1,8 @@
 const API_BASE_URL = "http://localhost:5122";
 let idOrdenActual = null;
+let idPacienteActual = null;
+let idCitaActual = null;
+let idMedicoActual = null;
 let ordenData = null;
 
 // Inyectar estilos del modal
@@ -186,6 +189,9 @@ document.addEventListener("DOMContentLoaded", function () {
 function obtenerParametrosURL() {
   const params = new URLSearchParams(window.location.search);
   idOrdenActual = params.get("idOrden");
+  idPacienteActual = params.get("idPaciente");
+  idCitaActual = params.get("idCita");
+  idMedicoActual = params.get("idMedico");
 
   if (!idOrdenActual) {
     showError("No se especificó el ID de la orden");
@@ -200,9 +206,9 @@ async function cargarInformacionOrden() {
     );
     const result = await res.json();
 
-    if (result.success && result.orden) {
-      ordenData = result.orden;
-      mostrarInformacionOrden(result.orden);
+    if (result.success && result.data) {
+      ordenData = result.data;
+      mostrarInformacionOrden(result.data);
     } else {
       showError("No se pudo cargar la información de la orden");
       setTimeout(() => window.history.back(), 2000);
@@ -327,6 +333,18 @@ function mostrarModalError(mensaje) {
   }
 }
 
+function showError(mensaje) {
+  mostrarModalError(mensaje);
+}
+
+function showWarning(mensaje) {
+  mostrarModalError(mensaje);
+}
+
+function showSuccess(mensaje) {
+  mostrarModalSuccess(mensaje);
+}
+
 function cerrarModalError() {
   const modal = document.getElementById("labResultModalError");
   if (modal) {
@@ -352,6 +370,7 @@ function cerrarModalSuccess() {
   if (modal) {
     modal.classList.remove("lab-result-modal-active");
   }
+  window.location.href = construirUrlLaboratorio();
 }
 
 function volver() {
@@ -360,8 +379,17 @@ function volver() {
       "¿Está seguro de que desea salir? Los datos no guardados se perderán."
     )
   ) {
-    window.location.href = `/laboratorio?idPaciente=${
-      ordenData?.idPaciente || ""
-    }`;
+    window.location.href = construirUrlLaboratorio();
   }
+}
+
+function construirUrlLaboratorio() {
+  const params = new URLSearchParams();
+  const idPaciente = idPacienteActual || ordenData?.idPaciente;
+
+  if (idPaciente) params.set("idPaciente", idPaciente);
+  if (idCitaActual) params.set("idCita", idCitaActual);
+  if (idMedicoActual) params.set("idMedico", idMedicoActual);
+
+  return `/laboratorio?${params.toString()}`;
 }

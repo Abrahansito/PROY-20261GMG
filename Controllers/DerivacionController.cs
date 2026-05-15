@@ -40,9 +40,19 @@ namespace SGMG.Controllers
       }
 
       // Pasar datos a la vista
+      var historiaClinica = await _context.HistoriasClinicas
+          .Where(h => h.IdPaciente == cita.IdPaciente)
+          .OrderByDescending(h => h.IdHistoria)
+          .FirstOrDefaultAsync();
+
+      var edadPaciente = historiaClinica != null
+          ? CalcularEdad(historiaClinica.FechaNacimiento)
+          : cita.Paciente.Edad;
+
       ViewBag.IdCita = idCita;
       ViewBag.Paciente = cita.Paciente;
       ViewBag.Medico = cita.Medico;
+      ViewBag.EdadPaciente = edadPaciente;
 
       return View();
     }
@@ -107,7 +117,7 @@ namespace SGMG.Controllers
         {
           success = true,
           message = $"Derivación a {request.EspecialidadDestino} (Prioridad: {request.Prioridad}) creada exitosamente.",
-          redirectUrl = Url.Action("Index", "Home")
+          redirectUrl = Url.Action("Historial", "HistorialDerivacion", new { idCita = request.IdCitaOrigen })
         });
       }
       catch (Exception ex)
@@ -121,6 +131,17 @@ namespace SGMG.Controllers
 
         return Json(new { success = false, message = "No se pudo registrar la derivación. Por favor, intente nuevamente." });
       }
+    }
+
+    private static int CalcularEdad(DateTime fechaNacimiento)
+    {
+      var hoy = DateTime.Today;
+      var edad = hoy.Year - fechaNacimiento.Year;
+
+      if (fechaNacimiento.Date > hoy.AddYears(-edad))
+        edad--;
+
+      return Math.Max(edad, 0);
     }
 
     // Clase para recibir los datos del POST

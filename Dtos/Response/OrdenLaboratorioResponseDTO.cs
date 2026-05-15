@@ -10,6 +10,7 @@ namespace SGMG.Dtos.Response
         public string DniPaciente { get; set; } = "";
         public DateTime FechaSolicitud { get; set; }
         public string ObservacionesAdicionales { get; set; } = "";
+        public string ObservacionesFinales { get; set; } = "";
         public string Resultados { get; set; } = "";
         public string Estado { get; set; } = "";
         public DateTime? FechaResultado { get; set; }

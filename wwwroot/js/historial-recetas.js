@@ -7,6 +7,8 @@
 
   // Variables globales
   let idPaciente = null;
+  let idCita = null;
+  let idMedico = null;
   let recetaSeleccionada = null;
 
   // Elementos del DOM
@@ -27,6 +29,16 @@
       idPaciente = parseInt(idPacienteInput.value);
     }
 
+    const idCitaInput = document.getElementById("idCita");
+    if (idCitaInput) {
+      idCita = parseInt(idCitaInput.value) || null;
+    }
+
+    const idMedicoInput = document.getElementById("idMedico");
+    if (idMedicoInput) {
+      idMedico = parseInt(idMedicoInput.value) || null;
+    }
+
     // Validar que exista el ID del paciente
     if (!idPaciente || isNaN(idPaciente)) {
       mostrarError("No se encontró el ID del paciente");
@@ -44,7 +56,11 @@
     // Botón nueva receta
     if (btnNuevaReceta) {
       btnNuevaReceta.addEventListener("click", function () {
-        window.location.href = "/Home/Receta";
+        const params = new URLSearchParams();
+        if (idPaciente) params.set("idPaciente", idPaciente);
+        if (idCita) params.set("idCita", idCita);
+        if (idMedico) params.set("idMedico", idMedico);
+        window.location.href = `/Home/Receta?${params.toString()}`;
       });
     }
 

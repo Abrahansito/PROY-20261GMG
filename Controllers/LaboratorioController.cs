@@ -147,7 +147,13 @@ namespace SGMG.Controllers
     {
       try
       {
-        throw new Exception("Error simulado para pruebas");
+        var response = await _laboratorioService.GetOrdenByIdAsync(idOrden);
+        return Ok(new
+        {
+          success = response.Success,
+          data = response.Data,
+          message = response.Message
+        });
       }
       catch (Exception ex)
       {

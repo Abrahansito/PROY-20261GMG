@@ -155,7 +155,7 @@
                                 <td>
     <button 
         class="btn-atender" 
-        onclick="atenderPaciente(@cita.IdPaciente)">
+        onclick="atenderPaciente(@cita.IdPaciente, @cita.IdCita, @cita.IdMedico)">
         <i class="fas fa-stethoscope me-1"></i>Atender
     </button>
 </td>
@@ -171,9 +171,9 @@
 
 @section Scripts {
     <script>
-        function atenderPaciente(idPaciente) {
+        function atenderPaciente(idPaciente, idCita, idMedico) {
             // Aquí implementarás la lógica para atender al paciente
-            window.location.href = `/historia-clinica/ver?idPaciente=${idPaciente}`;
+            window.location.href = `/historia-clinica/ver?idPaciente=${idPaciente}&idCita=${idCita}&idMedico=${idMedico}`;
             // window.location.href = '/medico/atender-paciente/' + idCita;
         }
 

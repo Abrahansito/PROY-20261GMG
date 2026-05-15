@@ -164,6 +164,60 @@
             background: #f9fafb;
         }
 
+        .diagnostics-table .diagnostic-detail-row:hover {
+            background: transparent;
+        }
+
+        .diagnostic-detail-row td {
+            padding: 0 12px 20px 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .diagnostic-detail-panel {
+            background: #eef8ff;
+            border-left: 4px solid #2563eb;
+            padding: 24px 28px;
+            margin-top: 4px;
+        }
+
+        .diagnostic-detail-title {
+            color: #1746b8;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        .diagnostic-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .diagnostic-detail-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 18px 20px;
+        }
+
+        .diagnostic-detail-label {
+            display: block;
+            color: #111827;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .diagnostic-detail-value {
+            display: block;
+            color: #1f2937;
+            font-size: 15px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
         .btn-details {
             background: #2563eb;
             color: white;
@@ -292,4 +346,10 @@
         .icon {
             width: 20px;
             height: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .diagnostic-detail-grid {
+                grid-template-columns: 1fr;
+            }
         }

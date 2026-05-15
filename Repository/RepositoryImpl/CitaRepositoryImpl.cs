@@ -68,7 +68,9 @@ namespace SGMG.Repository.RepositoryImpl
             .Include(c => c.Paciente)
             .Include(c => c.Medico)
             .Where(c => (c.EstadoCita == "Pagado" || c.EstadoCita == "Confirmada")
-                 && c.FechaCita.Date < ahora.Date)
+                 && c.FechaCita.Date < ahora.Date
+                 && c.IdTriage == null
+                 && !_context.Triages.Any(t => t.IdPaciente == c.IdPaciente))
             .ToListAsync();
 
         var citasOrdenadas = citas

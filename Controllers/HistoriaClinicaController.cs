@@ -81,6 +81,7 @@ namespace SGMG.Controllers
           ApellidoPaterno = model.Paciente.ApellidoPaterno ?? string.Empty,
           ApellidoMaterno = model.Paciente.ApellidoMaterno ?? string.Empty,
           Sexo = model.Paciente.Sexo ?? string.Empty,
+          Edad = CalcularEdad(model.HistoriaClinica.FechaNacimiento),
           FechaRegistro = DateTime.UtcNow
         };
 
@@ -207,6 +208,7 @@ namespace SGMG.Controllers
         paciente.ApellidoPaterno = model.Paciente.ApellidoPaterno ?? string.Empty;
         paciente.ApellidoMaterno = model.Paciente.ApellidoMaterno ?? string.Empty;
         paciente.Sexo = model.Paciente.Sexo ?? string.Empty;
+        paciente.Edad = CalcularEdad(model.HistoriaClinica.FechaNacimiento);
 
         await _pacienteRepository.UpdatePacienteAsync(paciente);
 
@@ -290,6 +292,17 @@ namespace SGMG.Controllers
           .Max();
 
       return $"HC-2025-{(ultimoNumero + 1):D4}";
+    }
+
+    private static int CalcularEdad(DateTime fechaNacimiento)
+    {
+      var hoy = DateTime.Today;
+      var edad = hoy.Year - fechaNacimiento.Year;
+
+      if (fechaNacimiento.Date > hoy.AddYears(-edad))
+        edad--;
+
+      return Math.Max(edad, 0);
     }
   }
 }

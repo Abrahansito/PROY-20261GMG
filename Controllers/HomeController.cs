@@ -33,15 +33,19 @@ public class HomeController : Controller
     return View();
   }
 
-  public IActionResult Receta()
+  public IActionResult Receta(int? idPaciente, int? idCita, int? idMedico, int? idHistoriaClinica)
   {
+    ViewBag.IdPaciente = idPaciente.HasValue && idPaciente.Value > 0 ? idPaciente : null;
+    ViewBag.IdCita = idCita.HasValue && idCita.Value > 0 ? idCita : null;
+    ViewBag.IdMedico = idMedico.HasValue && idMedico.Value > 0 ? idMedico : null;
+    ViewBag.IdHistoriaClinica = idHistoriaClinica.HasValue && idHistoriaClinica.Value > 0 ? idHistoriaClinica : null;
     _logger.LogInformation("Accediendo a la vista de generación de receta médica.");
     return View();
   }
 
 
   [HttpGet("Home/HistorialRecetas/{idPaciente}")]
-  public IActionResult HistorialRecetas(int idPaciente)
+  public IActionResult HistorialRecetas(int idPaciente, int? idCita, int? idMedico)
   {
     if (idPaciente <= 0)
     {
@@ -51,6 +55,8 @@ public class HomeController : Controller
 
    
     ViewBag.IdPaciente = idPaciente;
+    ViewBag.IdCita = idCita.HasValue && idCita.Value > 0 ? idCita : null;
+    ViewBag.IdMedico = idMedico.HasValue && idMedico.Value > 0 ? idMedico : null;
 
     return View();
   }

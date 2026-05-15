@@ -39,6 +39,18 @@ namespace SGMG.Controllers
 
       var paciente = cita.Paciente;
       var idPaciente = cita.IdPaciente;
+      var historiaClinica = await _context.HistoriasClinicas
+          .Where(h => h.IdPaciente == idPaciente)
+          .OrderByDescending(h => h.IdHistoria)
+          .FirstOrDefaultAsync();
+
+      var edadPaciente = historiaClinica != null
+          ? CalcularEdad(historiaClinica.FechaNacimiento)
+          : paciente.Edad;
+
+      var seguroPaciente = !string.IsNullOrWhiteSpace(historiaClinica?.TipoSeguro)
+          ? $"{historiaClinica.TipoSeguro} - Sistema Integral de Salud"
+          : "SIS - Sistema Integral de Salud";
 
       // Obtener el historial de derivaciones ordenado por fecha más reciente
       var historialDerivaciones = await _context.Derivaciones
@@ -64,6 +76,8 @@ namespace SGMG.Controllers
 
       // Pasar datos a la vista
       ViewBag.Paciente = paciente;
+      ViewBag.EdadPaciente = edadPaciente;
+      ViewBag.SeguroPaciente = seguroPaciente;
       ViewBag.HistorialDerivaciones = historialDerivaciones;
       ViewBag.IdCitaActual = idCita; // Pasar el ID de la cita actual
 
@@ -113,6 +127,17 @@ namespace SGMG.Controllers
       };
 
       return Json(detalle);
+    }
+
+    private static int CalcularEdad(DateTime fechaNacimiento)
+    {
+      var hoy = DateTime.Today;
+      var edad = hoy.Year - fechaNacimiento.Year;
+
+      if (fechaNacimiento.Date > hoy.AddYears(-edad))
+        edad--;
+
+      return Math.Max(edad, 0);
     }
   }
 }
