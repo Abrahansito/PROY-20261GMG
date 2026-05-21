@@ -199,6 +199,20 @@ function solicitarCita(idPaciente) {
   }
 }
 
+function editarHistoriaClinica(idPaciente) {
+  console.log("Editar historia clinica para paciente ID:", idPaciente);
+
+  if (!idPaciente) {
+    console.error("No se pudo obtener el ID del paciente");
+    showAlert("Error: No se pudo identificar al paciente.", "error");
+    return;
+  }
+
+  window.location.href = `/HistoriaClinica/Edit/${encodeURIComponent(
+    idPaciente
+  )}`;
+}
+
 // Mostrar errores de campo
 function displayPacienteFieldError(field, message) {
   const el = document.getElementById(`error-${field}`);
